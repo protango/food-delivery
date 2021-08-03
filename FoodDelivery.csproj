@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,8 +13,8 @@
     <Folder Include="Frontend\" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd Frontend&#xD;&#xA;yarn run init:$(ConfigurationName)" />
   </Target>
 
 </Project>

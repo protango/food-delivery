@@ -5,6 +5,9 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --dest ../wwwroot",
+    "watch": "yarn build --watch --mode development",
+    "init:Debug": "yarn install && yarn build --mode development",
+    "init:Release": "yarn install && yarn build --mode production",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"

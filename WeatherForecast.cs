@@ -1,6 +1,6 @@
 using System;
 
-namespace WebApplication1
+namespace FoodDelivery
 {
     public class WeatherForecast
     {
