@@ -8,8 +8,8 @@ namespace FoodDelivery.Db
     {
         public DbSet<Restaurant> Restaurants { get; set; }
 
-        public FoodDeliveryContext(DbContextOptions options) : base(options)
-        {
-        }
+#nullable disable
+        public FoodDeliveryContext(DbContextOptions options) : base(options) {}
+#nullable restore
     }
 }

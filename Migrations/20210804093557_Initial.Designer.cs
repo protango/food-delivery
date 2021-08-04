@@ -9,8 +9,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FoodDelivery.Migrations
 {
     [DbContext(typeof(FoodDeliveryContext))]
-    [Migration("20210804083602_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20210804093557_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

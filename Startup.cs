@@ -58,11 +58,7 @@ namespace FoodDelivery
             {
                 var path = context.Request.Path.Value;
 
-                if (path.StartsWith("/api"))
-                {
-                    context.Request.Path = path.Substring(4);
-                }
-                else if (!Path.HasExtension(path) && context.Request.Method == "GET") 
+                if (!(path?.StartsWith("/api") ?? false) && !Path.HasExtension(path) && context.Request.Method == "GET") 
                 {
                     context.Request.Path = "/index.html";
                 }
