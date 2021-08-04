@@ -13,8 +13,4 @@
     <Folder Include="Frontend\" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd Frontend&#xD;&#xA;yarn run init:$(ConfigurationName)" />
-  </Target>
-
 </Project>
