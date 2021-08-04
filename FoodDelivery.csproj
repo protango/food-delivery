@@ -5,6 +5,7 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
     <UserSecretsId>0d864931-f835-4a81-bf70-ff5cb52f049d</UserSecretsId>
     <Nullable>enable</Nullable>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
