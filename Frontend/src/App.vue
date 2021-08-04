@@ -21,8 +21,8 @@
         <div class="text-white">
           <h2>Are you a restaurant owner?</h2>
           <p>We're always looking for new restaurants to come into our network, register now!</p>
-          <button class="btn btn-outline-light me-1" type="button">Register as a restaurant</button>
-          <button class="btn btn-outline-light" type="button">Sign in as a restaurant</button>
+          <button class="btn btn-outline-light me-1 mb-1" type="button">Register as a restaurant</button>
+          <button class="btn btn-outline-light mb-1" type="button">Sign in as a restaurant</button>
         </div>
       </div>
 
