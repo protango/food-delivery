@@ -20,11 +20,19 @@ namespace FoodDelivery.Controllers
             _context = context;
         }
 
-        // GET: api/Meals
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Meal>>> GetMeals()
+        // GET: api/Meals/ForRestaurant/5
+        [HttpGet("ForRestaurant/{id}")]
+        public async Task<ActionResult<IEnumerable<Meal>>> GetMealsForRestaurant(long id)
         {
-            return await _context.Meals.ToListAsync();
+            var restaurant = await _context.Restaurants.FindAsync(id);
+
+            if (restaurant == null)
+            {
+                return NotFound();
+            }
+
+
+            return restaurant.Meals.ToList();
         }
 
         // GET: api/Meals/5

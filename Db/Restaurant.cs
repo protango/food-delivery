@@ -14,7 +14,7 @@ namespace FoodDelivery.Db
 
         public string Description { get; set; }
 
-        public long OwnerUserId { get; set; }
+        public string OwnerUserId { get; set; }
 
 #nullable disable
         [JsonIgnore]
@@ -27,14 +27,10 @@ namespace FoodDelivery.Db
         public ICollection<Order> Orders { get; set; }
 #nullable restore
 
-        public Restaurant(string name, string description) {
+        public Restaurant(string name, string description, string ownerUserId) {
             Name = name;
             Description = description;
-        }
-
-        public bool CheckAccess(long userId) 
-        {
-            return userId == OwnerUserId;
+            OwnerUserId = ownerUserId;
         }
     }
 }

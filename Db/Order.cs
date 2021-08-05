@@ -20,7 +20,7 @@ namespace FoodDelivery.Db
         [Column(TypeName = "text")]
         public OrderStatus Status { get; set; }
 
-        public long UserId { get; set; }
+        public string UserId { get; set; }
 
 #nullable disable
         public User User { get; set; }
@@ -36,10 +36,5 @@ namespace FoodDelivery.Db
 
         [NotMapped]
         public decimal TotalAmount { get => Meals.Sum(x => x.Price); }
-
-        public bool CheckAccess(long userId)
-        {
-            return UserId == userId;
-        }
     }
 }

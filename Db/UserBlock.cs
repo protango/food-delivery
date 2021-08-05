@@ -8,16 +8,11 @@ namespace FoodDelivery.Db
     {
         public long RestaurantId { get; set; }
 
-        public long UserId { get; set; }
+        public string UserId { get; set; }
 
 #nullable disable
         public Restaurant Restaurant { get; set; }
         public User User { get; set; }
 #nullable restore
-
-        public bool CheckAccess(long userId)
-        {
-            return userId == Restaurant.OwnerUserId;
-        }
     }
 }
