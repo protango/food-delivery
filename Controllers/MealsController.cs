@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FoodDelivery.Db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodDelivery.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
     public class MealsController : ControllerBase
     {
         private readonly FoodDeliveryContext _context;
