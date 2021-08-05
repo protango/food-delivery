@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace FoodDelivery.Db
 {
@@ -23,8 +24,13 @@ namespace FoodDelivery.Db
 
 #nullable disable
         public User User { get; set; }
+
         public Restaurant Restaurant { get; set; }
+
+        [JsonIgnore]
         public ICollection<Meal> Meals { get; set; }
+
+        [JsonIgnore]
         public ICollection<OrderStatusChange> OrderStatusChanges { get; set; }
 #nullable restore
 

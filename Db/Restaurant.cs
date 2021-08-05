@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace FoodDelivery.Db
 {
@@ -16,9 +17,14 @@ namespace FoodDelivery.Db
         public long OwnerUserId { get; set; }
 
 #nullable disable
+        [JsonIgnore]
         public ICollection<Meal> Meals { get; set; }
+
         [ForeignKey("OwnerUserId")]
         public User Owner { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Order> Orders { get; set; }
 #nullable restore
 
         public Restaurant(string name, string description) {

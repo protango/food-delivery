@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace FoodDelivery.Db
 {
@@ -13,7 +14,9 @@ namespace FoodDelivery.Db
         public UserRole Role { get; set; }
 
 #nullable disable
+        [JsonIgnore]
         public ICollection<Order> Orders { get; set; }
+        [JsonIgnore]
         public ICollection<Restaurant> Restaurants { get; set; }
 #nullable restore
     }
