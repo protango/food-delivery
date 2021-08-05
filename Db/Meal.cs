@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FoodDelivery.Db
 {
-    public class Restaurant
+    public class Meal
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
@@ -13,15 +13,17 @@ namespace FoodDelivery.Db
 
         public string Description { get; set; }
 
-        public long OwnerUserId { get; set; }
+        public decimal Price { get; set; }
+
+        public long RestaurantId { get; set; }
 
 #nullable disable
-        public ICollection<Meal> Meals { get; set; }
-        [ForeignKey("OwnerUserId")]
-        public User Owner { get; set; }
+        public Restaurant Restaurant { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
 #nullable restore
 
-        public Restaurant(string name, string description) {
+        public Meal(string name, string description) {
             Name = name;
             Description = description;
         }
