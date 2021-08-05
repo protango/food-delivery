@@ -19,5 +19,10 @@ namespace FoodDelivery.Db
         [JsonIgnore]
         public ICollection<Restaurant> Restaurants { get; set; }
 #nullable restore
+
+        public bool CheckAccess(long userId)
+        {
+            return userId == Id;
+        }
     }
 }

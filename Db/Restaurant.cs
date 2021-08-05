@@ -31,5 +31,10 @@ namespace FoodDelivery.Db
             Name = name;
             Description = description;
         }
+
+        public bool CheckAccess(long userId) 
+        {
+            return userId == OwnerUserId;
+        }
     }
 }

@@ -37,6 +37,9 @@ namespace FoodDelivery.Db
         [NotMapped]
         public decimal TotalAmount { get => Meals.Sum(x => x.Price); }
 
-
+        public bool CheckAccess(long userId)
+        {
+            return UserId == userId;
+        }
     }
 }

@@ -14,5 +14,10 @@ namespace FoodDelivery.Db
         public Restaurant Restaurant { get; set; }
         public User User { get; set; }
 #nullable restore
+
+        public bool CheckAccess(long userId)
+        {
+            return userId == Restaurant.OwnerUserId;
+        }
     }
 }
