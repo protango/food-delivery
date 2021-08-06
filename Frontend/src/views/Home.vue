@@ -1,6 +1,6 @@
 <template>
   <main>
-    <SignIn :visible="loginVisible"></SignIn>
+    <SignInUp ref="signin"></SignInUp>
     <div class="container py-4">
       <header class="pb-3 mb-4 border-bottom">
         <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
@@ -13,8 +13,8 @@
         <div class="container-fluid py-5">
           <h1 class="display-5 fw-bold">Food Delivery Co</h1>
           <p class="col-md-8 fs-4">We deliver high quality food, right to your door! Sign up today to get two meals for the price of two!</p>
-          <button class="btn btn-primary btn-lg me-1" type="button" v-on:click="login">Sign up</button>
-          <button class="btn btn-outline-secondary btn-lg" type="button" v-on:click="login">Sign in</button>
+          <button class="btn btn-primary btn-lg me-1" type="button" @click="login">Sign up</button>
+          <button class="btn btn-outline-secondary btn-lg" type="button" @click="login">Sign in</button>
         </div>
       </div>
 
@@ -43,20 +43,23 @@
 </style>
 
 <script lang="ts">
-import SignIn from '@/components/SignIn.vue';
+import SignInUp from '@/components/SignInUp.vue';
 import { Options, Vue } from 'vue-class-component';
 
 @Options({
   components: {
-    SignIn
+    SignInUp
   }
 })
 export default class Home extends Vue {
-  yolo = 'Blah';
   loginVisible = false;
 
+  get signin (): SignInUp {
+    return this.$refs.signin as SignInUp;
+  }
+
   login (): void {
-    this.loginVisible = !this.loginVisible;
+    this.signin.show();
   }
 }
 </script>
