@@ -54,7 +54,7 @@ namespace FoodDelivery.Controllers
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
+                expires: DateTime.Now.AddHours(double.Parse(_configuration["JWT:Duration"])),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
@@ -82,11 +82,9 @@ namespace FoodDelivery.Controllers
             return await CreateToken(user);
         }
 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(409)]
+        [ProducesResponseType(201)]
         [HttpPost("Register")]
-        public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterModel model)
+        public async Task<ActionResult> Register([FromBody] RegisterModel model)
         {
             if (!(await roleManager.RoleExistsAsync(model.Role)))
                 return BadRequest(new ProblemDetails() { Title = "Invalid role" });
@@ -107,7 +105,7 @@ namespace FoodDelivery.Controllers
 
             await userManager.AddToRoleAsync(user, model.Role);
 
-            return Ok(new RegisterResponse("Success", "User created successfully"));
+            return CreatedAtAction("Register", new { user.Id });
         }
 
         [HttpGet("Unregister")]
