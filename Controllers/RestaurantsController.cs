@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FoodDelivery.Db;
+using Microsoft.AspNetCore.Authorization;
+using FoodDelivery.Models;
 
 namespace FoodDelivery.Controllers
 {
@@ -22,86 +24,82 @@ namespace FoodDelivery.Controllers
 
         // GET: api/Restaurants
         [HttpGet]
+        [Authorize(Roles = "CUSTOMER")]
         public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
         {
             return await _context.Restaurants.ToListAsync();
         }
 
-        // GET: api/Restaurants/5
+        // GET: api/Restaurants
         [HttpGet("{id}")]
+        [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
         public async Task<ActionResult<Restaurant>> GetRestaurant(long id)
         {
-            var restaurant = await _context.Restaurants.FindAsync(id);
-
+            var restaurant = (Restaurant?)await _context.Restaurants.FindAsync(id);
             if (restaurant == null)
-            {
                 return NotFound();
-            }
+            if (!User.IsInRole("CUSTOMER") && restaurant.OwnerUserId != Utilities.ExtractUserId(User))
+                return Forbid();
 
             return restaurant;
         }
 
-        // PUT: api/Restaurants/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRestaurant(long id, Restaurant restaurant)
+        [HttpPost]
+        [Authorize(Roles = "RESTAURANT_OWNER")]
+        [ProducesResponseType(201)]
+        public async Task<ActionResult<Restaurant>> PostRestaurant(CreateRestaurantModel restaurant)
         {
-            if (id != restaurant.Id)
-            {
-                return BadRequest();
-            }
+            var dbRestaurant = _context.Restaurants.Add(new Restaurant() {
+                Name = restaurant.Name,
+                Description = restaurant.Description,
+                OwnerUserId = Utilities.ExtractUserId(User),
+                Meals = restaurant.Meals.Select(x => new Meal() { 
+                    Name = x.Name,
+                    Description = x.Description,
+                    Price = x.Price
+                }).ToArray()
+            });
 
-            _context.Entry(restaurant).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RestaurantExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return CreatedAtAction("PostRestaurant", dbRestaurant);
+        }
+
+        [ProducesResponseType(204)]
+        [HttpPut("{id}")]
+        [Authorize(Roles = "RESTAURANT_OWNER")]
+        public async Task<ActionResult<Restaurant>> PutRestaurant(long id, UpdateRestaurantModel restaurant)
+        {
+            var dbRestaurant = (Restaurant?)await _context.Restaurants.FindAsync(id);
+            if (dbRestaurant == null)
+                return NotFound();
+            if (dbRestaurant.OwnerUserId != Utilities.ExtractUserId(User))
+                return Forbid();
+
+            dbRestaurant.Name = restaurant.Name;
+            dbRestaurant.Description = restaurant.Description;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // POST: api/Restaurants
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Restaurant>> PostRestaurant(Restaurant restaurant)
-        {
-            _context.Restaurants.Add(restaurant);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRestaurant", new { id = restaurant.Id }, restaurant);
-        }
-
-        // DELETE: api/Restaurants/5
+        [ProducesResponseType(204)]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRestaurant(long id)
+        [Authorize(Roles = "RESTAURANT_OWNER")]
+        public async Task<ActionResult<Restaurant>> DeleteRestaurant(long id)
         {
             var restaurant = await _context.Restaurants.FindAsync(id);
             if (restaurant == null)
-            {
                 return NotFound();
-            }
+
+            if (restaurant.OwnerUserId != Utilities.ExtractUserId(User))
+                return Forbid();
 
             _context.Restaurants.Remove(restaurant);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool RestaurantExists(long id)
-        {
-            return _context.Restaurants.Any(e => e.Id == id);
         }
     }
 }
