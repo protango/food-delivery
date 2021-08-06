@@ -14,27 +14,23 @@ namespace FoodDelivery.Db
 
         public long RestaurantId { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime CreatedAt { get; set; }
 
         [Column(TypeName = "text")]
         public OrderStatus Status { get; set; }
 
-        public string UserId { get; set; }
-
-#nullable disable
-        public User User { get; set; }
-
-        public Restaurant Restaurant { get; set; }
+        public string UserId { get; set; } = "";
 
         [JsonIgnore]
-        public ICollection<Meal> Meals { get; set; }
+        public User? User { get; set; }
 
         [JsonIgnore]
-        public ICollection<OrderStatusChange> OrderStatusChanges { get; set; }
-#nullable restore
+        public Restaurant? Restaurant { get; set; }
 
-        [NotMapped]
-        public decimal TotalAmount { get => Meals.Sum(x => x.Price); }
+        [JsonIgnore]
+        public ICollection<Meal>? Meals { get; set; }
+
+        [JsonIgnore]
+        public ICollection<OrderStatusChange>? OrderStatusChanges { get; set; }
     }
 }

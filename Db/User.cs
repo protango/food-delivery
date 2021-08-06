@@ -11,11 +11,13 @@ namespace FoodDelivery.Db
 {
     public class User : IdentityUser
     {
-#nullable disable
         [JsonIgnore]
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<Order>? Orders { get; set; }
         [JsonIgnore]
-        public ICollection<Restaurant> Restaurants { get; set; }
-#nullable restore
+        public ICollection<Restaurant>? Restaurants { get; set; }
+        [JsonIgnore]
+        public ICollection<Block>? OutboundBlocks { get; set; }
+        [JsonIgnore]
+        public ICollection<Block>? InboundBlocks { get; set; }
     }
 }

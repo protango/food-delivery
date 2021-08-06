@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace FoodDelivery.Db
 {
@@ -9,11 +10,9 @@ namespace FoodDelivery.Db
         public long OrderId { get; set; }
         public OrderStatus Status { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime At { get; set; }
 
-#nullable disable
-        public Order Order { get; set; }
-#nullable restore
+        [JsonIgnore]
+        public Order? Order { get; set; }
     }
 }

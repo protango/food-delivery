@@ -10,27 +10,20 @@ namespace FoodDelivery.Db
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
-        public string OwnerUserId { get; set; }
+        public string OwnerUserId { get; set; } = "";
 
-#nullable disable
         [JsonIgnore]
-        public ICollection<Meal> Meals { get; set; }
+        public ICollection<Meal>? Meals { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("OwnerUserId")]
-        public User Owner { get; set; }
+        public User? Owner { get; set; }
 
         [JsonIgnore]
-        public ICollection<Order> Orders { get; set; }
-#nullable restore
-
-        public Restaurant(string name, string description, string ownerUserId) {
-            Name = name;
-            Description = description;
-            OwnerUserId = ownerUserId;
-        }
+        public ICollection<Order>? Orders { get; set; }
     }
 }
