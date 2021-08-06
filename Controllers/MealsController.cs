@@ -30,7 +30,7 @@ namespace FoodDelivery.Controllers
             var restaurant = await _context.Restaurants.FindAsync(id);
 
             if (restaurant == null)
-                return NotFound();
+                return NotFound("Invalid id");
 
             if (!User.IsInRole("CUSTOMER") && restaurant.OwnerUserId != Utilities.ExtractUserId(User))
                 return Forbid();
@@ -97,7 +97,7 @@ namespace FoodDelivery.Controllers
         {
             var meal = await _context.Meals.FindAsync(id);
             if (meal == null)
-                return NotFound();
+                return NotFound("Invalid id");
 
             await _context.Entry(meal).Reference(x => x.Restaurant).LoadAsync();
             if (meal.Restaurant!.OwnerUserId != Utilities.ExtractUserId(User))

@@ -78,7 +78,7 @@ namespace FoodDelivery.Controllers
         {
             var dbRestaurant = (Restaurant?)await _context.Restaurants.FindAsync(id);
             if (dbRestaurant == null)
-                return NotFound();
+                return NotFound("Invalid id");
             if (dbRestaurant.OwnerUserId != Utilities.ExtractUserId(User))
                 return Forbid();
 
@@ -97,7 +97,7 @@ namespace FoodDelivery.Controllers
         {
             var restaurant = await _context.Restaurants.FindAsync(id);
             if (restaurant == null)
-                return NotFound();
+                return NotFound("Invalid id");
 
             if (restaurant.OwnerUserId != Utilities.ExtractUserId(User))
                 return Forbid();

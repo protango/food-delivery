@@ -67,7 +67,7 @@ namespace FoodDelivery.Controllers
         {
             var block = await _context.Blocks.FindAsync(id);
             if (block == null)
-                return NotFound();
+                return NotFound("Invalid id");
             if (block.BlockingUserId != Utilities.ExtractUserId(User))
                 return Forbid();
 
