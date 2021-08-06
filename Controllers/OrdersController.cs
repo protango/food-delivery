@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FoodDelivery.Db;
+using Microsoft.AspNetCore.Authorization;
+using FoodDelivery.Models;
 
 namespace FoodDelivery.Controllers
 {
@@ -22,86 +24,114 @@ namespace FoodDelivery.Controllers
 
         // GET: api/Orders
         [HttpGet]
+        [Authorize(Roles = "CUSTOMER")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            return await _context.Orders.ToListAsync();
+            var userId = Utilities.ExtractUserId(User);
+            return await _context.Orders.Where(x => x.UserId == userId).ToListAsync();
         }
 
-        // GET: api/Orders/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(long id)
+        // GET: api/Orders/ForRestaurant/5
+        [HttpGet("ForRestaurant/{id}")]
+        [Authorize(Roles = "RESTAURANT_OWNER")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersForRestaurant(long id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var userId = Utilities.ExtractUserId(User);
+            var restaurant = await _context.Restaurants.FindAsync(id);
+            if (restaurant.OwnerUserId != userId)
+                return Forbid();
 
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return order;
-        }
-
-        // PUT: api/Orders/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(long id, Order order)
-        {
-            if (id != order.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(order).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!OrderExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await _context.Orders.Where(x => x.RestaurantId == id).ToListAsync();
         }
 
         // POST: api/Orders
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [ProducesResponseType(201)]
         [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
+        [Authorize(Roles = "CUSTOMER")]
+        public async Task<ActionResult<Order>> PostOrder(CreateOrderModel createOrder)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            // Link meals
+            IEnumerable<Meal?> orderMeals =
+                (from mealId in createOrder.MealIds
+                 join meal in _context.Meals on mealId equals meal.Id into gj
+                 from meal in gj.DefaultIfEmpty()
+                 select meal).ToArray();
 
-            return CreatedAtAction("GetOrder", new { id = order.Id }, order);
-        }
-
-        // DELETE: api/Orders/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrder(long id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
+            // Validate meals
+            if (!orderMeals.Any())
+                return BadRequest($"Order must contain at least one meal");
+            foreach (var meal in orderMeals)
             {
-                return NotFound();
+                if (meal == null)
+                    return BadRequest($"Order contains one or more invalid meal ids");
+                if (meal.RestaurantId != createOrder.RestaurantId)
+                    return BadRequest($"Order may only contain meals from one restaurant");
             }
 
-            _context.Orders.Remove(order);
+            // Construct order
+            var order = _context.Orders.Add(new Order() { 
+                RestaurantId = createOrder.RestaurantId,
+                UserId = Utilities.ExtractUserId(User),
+                OrderStatusChanges = new[] {
+                    new OrderStatusChange() {
+                        Status = OrderStatus.PLACED
+                    }
+                },
+                Status = OrderStatus.PLACED,
+                Meals = (ICollection<Meal>)orderMeals
+            });
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("PostOrder", order.Entity);
+        }
+
+        [ProducesResponseType(204)]
+        [HttpPut("Status/{orderId}/{status}")]
+        [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
+        public async Task<IActionResult> UpdateStatus(long orderId, OrderStatus status) {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null)
+                return NotFound("Invalid order id");
+
+            if (order.Status == status)
+                return BadRequest("Order already has this status");
+
+            // Ensure user is correct role for requested status
+            var statusRequiredRole = new Dictionary<OrderStatus, string>() {
+                { OrderStatus.PLACED, "CUSTOMER" },
+                { OrderStatus.CANCELLED, "CUSTOMER" },
+                { OrderStatus.PROCESSING, "RESTAURANT_OWNER" },
+                { OrderStatus.EN_ROUTE, "RESTAURANT_OWNER" },
+                { OrderStatus.DELIVERED, "RESTAURANT_OWNER" },
+                { OrderStatus.RECEIVED, "CUSTOMER" }
+            };
+            if (!User.IsInRole(statusRequiredRole[status])) {
+                return Forbid();
+            }
+
+            // Ensure status move in the correct direction
+            var validNextStatuses = new Dictionary<OrderStatus, OrderStatus[]>() {
+                { OrderStatus.PLACED, new[] { OrderStatus.CANCELLED, OrderStatus.PROCESSING } },
+                { OrderStatus.CANCELLED, Array.Empty<OrderStatus>() },
+                { OrderStatus.PROCESSING, new[] { OrderStatus.EN_ROUTE } },
+                { OrderStatus.EN_ROUTE, new[] { OrderStatus.DELIVERED } },
+                { OrderStatus.DELIVERED, new[] { OrderStatus.RECEIVED } },
+                { OrderStatus.RECEIVED, Array.Empty<OrderStatus>() }
+            };
+            if (!validNextStatuses[order.Status].Contains(status)) {
+                return BadRequest(
+                    $"Order status cannot move from {Enum.GetName(typeof(OrderStatus), order.Status)} to {Enum.GetName(typeof(OrderStatus), status)}"
+                );
+            }
+
+            order.Status = status;
+            _context.OrderStatusChanges.Add(new OrderStatusChange() {
+                OrderId = orderId,
+                Status = status
+            });
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool OrderExists(long id)
-        {
-            return _context.Orders.Any(e => e.Id == id);
         }
     }
 }
