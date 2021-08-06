@@ -32,5 +32,7 @@ namespace FoodDelivery.Db
 
         [JsonIgnore]
         public ICollection<OrderStatusChange>? OrderStatusChanges { get; set; }
+
+        public string? UserName { get => User?.UserName; }
     }
 }

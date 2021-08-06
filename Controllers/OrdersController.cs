@@ -28,7 +28,11 @@ namespace FoodDelivery.Controllers
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             var userId = Utilities.ExtractUserId(User);
-            return await _context.Orders.Where(x => x.UserId == userId).ToListAsync();
+            
+            return await _context.Orders
+                .Where(x => x.UserId == userId)
+                .Include(x => x.User)
+                .ToListAsync();
         }
 
         // GET: api/Orders/ForRestaurant/5
@@ -41,7 +45,10 @@ namespace FoodDelivery.Controllers
             if (restaurant.OwnerUserId != userId)
                 return StatusCode(403, "User does not have access to this data");
 
-            return await _context.Orders.Where(x => x.RestaurantId == id).ToListAsync();
+            return await _context.Orders
+                .Where(x => x.RestaurantId == id)
+                .Include(x => x.User)
+                .ToListAsync();
         }
 
         // POST: api/Orders
@@ -90,7 +97,7 @@ namespace FoodDelivery.Controllers
                 Meals = (ICollection<Meal>)orderMeals
             });
             await _context.SaveChangesAsync();
-
+            await _context.Entry(order.Entity).Reference(x => x.User).LoadAsync();
             return CreatedAtAction("PostOrder", order.Entity);
         }
 
