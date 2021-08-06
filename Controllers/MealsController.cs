@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FoodDelivery.Db;
 using Microsoft.AspNetCore.Authorization;
+using FoodDelivery.Models;
 
 namespace FoodDelivery.Controllers
 {
@@ -32,62 +33,64 @@ namespace FoodDelivery.Controllers
                 return NotFound();
 
             if (!User.IsInRole("CUSTOMER") && restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Unauthorized("Cannot access a restaurant you are not the owner of");
+                return Forbid();
 
-            return restaurant.Meals.ToList();
+            return await _context.Meals.Where(x => x.RestaurantId == id).ToListAsync();
         }
 
         // PUT: api/Meals/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [ProducesResponseType(204)]
         [HttpPut("{id}")]
         [Authorize(Roles = "RESTAURANT_OWNER")]
-        public async Task<IActionResult> PutMeal(long id, Meal meal)
+        public async Task<IActionResult> PutMeal(long id, CreateMealModel meal)
         {
-            if (meal.Restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Unauthorized("Cannot access a restaurant you are not the owner of");
+            var dbMeal = (Meal?)await _context.Meals.FirstOrDefaultAsync(x => x.Id == id);
+            if (dbMeal == null) 
+                return NotFound("Invalid restaurant id");
 
-            if (id != meal.Id)
-            {
-                return BadRequest();
-            }
+            await _context.Entry(dbMeal).Reference(x => x.Restaurant).LoadAsync();
+            if (dbMeal.Restaurant!.OwnerUserId != Utilities.ExtractUserId(User))
+                return Forbid();
 
-            _context.Entry(meal).State = EntityState.Modified;
+            dbMeal.Name = meal.Name;
+            dbMeal.Description = meal.Description;
+            dbMeal.Price = meal.Price;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MealExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
         // POST: api/Meals
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [ProducesResponseType(201)]
+        [HttpPost("{restaurantId}")]
         [Authorize(Roles = "RESTAURANT_OWNER")]
-        public async Task<ActionResult<Meal>> PostMeal(Meal meal)
+        public async Task<ActionResult<Meal>> PostMeal(long restaurantId, CreateMealModel meal)
         {
-            if (meal.Restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Unauthorized("Cannot access a restaurant you are not the owner of");
+            Restaurant? restaurant = await _context.Restaurants.FindAsync(restaurantId);
+            if (restaurant == null)
+                return NotFound("Invalid restaurant id");
 
-            _context.Meals.Add(meal);
+            if (restaurant.OwnerUserId != Utilities.ExtractUserId(User))
+                return Forbid();
+
+            var dbMeal = new Meal()
+            {
+                RestaurantId = restaurantId,
+                Description = meal.Description,
+                Name = meal.Name,
+                Price = meal.Price
+            };
+
+            _context.Meals.Add(dbMeal);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMeal", new { id = meal.Id }, meal);
+            return CreatedAtAction("PostMeal", dbMeal);
         }
 
         // DELETE: api/Meals/5
+        [ProducesResponseType(204)]
         [HttpDelete("{id}")]
         [Authorize(Roles = "RESTAURANT_OWNER")]
         public async Task<IActionResult> DeleteMeal(long id)
@@ -96,18 +99,14 @@ namespace FoodDelivery.Controllers
             if (meal == null)
                 return NotFound();
 
-            if (meal.Restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Unauthorized("Cannot access a restaurant you are not the owner of");
+            await _context.Entry(meal).Reference(x => x.Restaurant).LoadAsync();
+            if (meal.Restaurant!.OwnerUserId != Utilities.ExtractUserId(User))
+                return Forbid();
 
             _context.Meals.Remove(meal);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool MealExists(long id)
-        {
-            return _context.Meals.Any(e => e.Id == id);
         }
     }
 }
