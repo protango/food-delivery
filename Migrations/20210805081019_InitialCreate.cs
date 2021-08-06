@@ -22,6 +22,12 @@ namespace FoodDelivery.Migrations
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
+            // Seed roles to DB
+            migrationBuilder.InsertData("AspNetRoles", new[] { "Id", "Name", "NormalizedName", "ConcurrencyStamp" }, new[,] {
+                { "e74ecaa8-0aed-4017-a0b2-e1d844c7e7ab", "RESTAURANT_OWNER", "RESTAURANT_OWNER", "5ce89c1e-c2b0-4b1f-a0b9-7f00fc206601" },
+                { "50c3fb15-d9ad-4f12-a9d4-33e950cd2ae5", "CUSTOMER", "CUSTOMER", "39cc0bd4-e3f1-41ec-8469-e46bd9efaa6d" }
+            });
+
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
