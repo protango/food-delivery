@@ -33,7 +33,7 @@ namespace FoodDelivery.Controllers
                 return NotFound("Invalid id");
 
             if (!User.IsInRole("CUSTOMER") && restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             return await _context.Meals.Where(x => x.RestaurantId == id).ToListAsync();
         }
@@ -51,7 +51,7 @@ namespace FoodDelivery.Controllers
 
             await _context.Entry(dbMeal).Reference(x => x.Restaurant).LoadAsync();
             if (dbMeal.Restaurant!.OwnerUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             dbMeal.Name = meal.Name;
             dbMeal.Description = meal.Description;
@@ -73,7 +73,7 @@ namespace FoodDelivery.Controllers
                 return NotFound("Invalid restaurant id");
 
             if (restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             var dbMeal = new Meal()
             {
@@ -101,7 +101,7 @@ namespace FoodDelivery.Controllers
 
             await _context.Entry(meal).Reference(x => x.Restaurant).LoadAsync();
             if (meal.Restaurant!.OwnerUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             _context.Meals.Remove(meal);
             await _context.SaveChangesAsync();

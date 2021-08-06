@@ -69,7 +69,7 @@ namespace FoodDelivery.Controllers
             if (block == null)
                 return NotFound("Invalid id");
             if (block.BlockingUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             _context.Blocks.Remove(block);
             await _context.SaveChangesAsync();

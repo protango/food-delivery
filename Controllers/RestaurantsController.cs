@@ -43,7 +43,7 @@ namespace FoodDelivery.Controllers
             if (restaurant == null)
                 return NotFound("Invalid restaurant id");
             if (!User.IsInRole("CUSTOMER") && restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return StatusCode(403, "User does not have access to this restaurant");
+                return StatusCode(403, "User does not have access to this data");
             if (await _context.Blocks.FindAsync(restaurant.OwnerUserId, userId) != null)
                 return StatusCode(403, "User is blocked");
 
@@ -80,7 +80,7 @@ namespace FoodDelivery.Controllers
             if (dbRestaurant == null)
                 return NotFound("Invalid id");
             if (dbRestaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             dbRestaurant.Name = restaurant.Name;
             dbRestaurant.Description = restaurant.Description;
@@ -100,7 +100,7 @@ namespace FoodDelivery.Controllers
                 return NotFound("Invalid id");
 
             if (restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             _context.Restaurants.Remove(restaurant);
             await _context.SaveChangesAsync();

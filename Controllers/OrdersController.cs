@@ -39,7 +39,7 @@ namespace FoodDelivery.Controllers
             var userId = Utilities.ExtractUserId(User);
             var restaurant = await _context.Restaurants.FindAsync(id);
             if (restaurant.OwnerUserId != userId)
-                return Forbid();
+                return StatusCode(403, "User does not have access to this data");
 
             return await _context.Orders.Where(x => x.RestaurantId == id).ToListAsync();
         }
@@ -55,9 +55,7 @@ namespace FoodDelivery.Controllers
             var restaurant = (Restaurant?)await _context.Restaurants.FindAsync(createOrder.RestaurantId);
             if (restaurant == null) 
                 return NotFound("Invalid restaurant id");
-            await _context.Entry(restaurant).Reference(x => x.Owner).LoadAsync();
-            await _context.Entry(restaurant.Owner!).Reference(x => x.OutboundBlocks).LoadAsync();
-            if (restaurant.Owner!.OutboundBlocks!.Any(x => x.BlockedUserId == userId) {
+            if (await _context.Blocks.FindAsync(restaurant.OwnerUserId, userId) != null) {
                 return StatusCode(403, "User is blocked");
             }
 
@@ -100,10 +98,16 @@ namespace FoodDelivery.Controllers
         [HttpPut("Status/{orderId}/{status}")]
         [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
         public async Task<IActionResult> UpdateStatus(long orderId, OrderStatus status) {
+            var userId = Utilities.ExtractUserId(User);
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null)
                 return NotFound("Invalid order id");
 
+            await _context.Entry(order).Reference(x => x.Restaurant).LoadAsync();
+            if (order.Restaurant!.OwnerUserId != userId && order.UserId != userId)
+                return StatusCode(403, "User does not have access to this data");
+
+            // Ensure status is different
             if (order.Status == status)
                 return BadRequest("Order already has this status");
 
@@ -117,7 +121,7 @@ namespace FoodDelivery.Controllers
                 { OrderStatus.RECEIVED, "CUSTOMER" }
             };
             if (!User.IsInRole(statusRequiredRole[status])) {
-                return Forbid();
+                return StatusCode(403, "User does not have permission to change order to this status");
             }
 
             // Ensure status move in the correct direction
