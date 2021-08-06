@@ -38,6 +38,7 @@ namespace FoodDelivery.Controllers
             var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Aud, _configuration["JWT:Audience"]),
                     new Claim(JwtRegisteredClaimNames.Iss, _configuration["JWT:Issuer"]),
@@ -76,7 +77,7 @@ namespace FoodDelivery.Controllers
         [Authorize]
         public async Task<ActionResult<JwtResponse>> Refresh()
         {
-            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            var user = await userManager.FindByNameAsync(User.Identity?.Name);
             if (user == null) return Unauthorized(new ProblemDetails() { Title = "User not found" });
             return await CreateToken(user);
         }
@@ -87,8 +88,7 @@ namespace FoodDelivery.Controllers
         [HttpPost("Register")]
         public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterModel model)
         {
-            var allowedRoles = new string[] { "CUSTOMER", "RESTAURANT_OWNER" };
-            if (!allowedRoles.Contains(model.Role))
+            if (!(await roleManager.RoleExistsAsync(model.Role)))
                 return BadRequest(new ProblemDetails() { Title = "Invalid role" });
 
             var userExists = await userManager.FindByNameAsync(model.Username);
@@ -108,6 +108,15 @@ namespace FoodDelivery.Controllers
             await userManager.AddToRoleAsync(user, model.Role);
 
             return Ok(new RegisterResponse("Success", "User created successfully"));
+        }
+
+        [HttpGet("Unregister")]
+        [Authorize]
+        public async Task<ActionResult<IdentityResult>> Unregister()
+        {
+            var user = await userManager.FindByNameAsync(User.Identity?.Name);
+            if (user == null) return Unauthorized(new ProblemDetails() { Title = "User not found" });
+            return await userManager.DeleteAsync(user);
         }
     }
 }
