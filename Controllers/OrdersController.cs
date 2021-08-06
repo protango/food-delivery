@@ -50,6 +50,17 @@ namespace FoodDelivery.Controllers
         [Authorize(Roles = "CUSTOMER")]
         public async Task<ActionResult<Order>> PostOrder(CreateOrderModel createOrder)
         {
+            // Check if user is blocked
+            var userId = Utilities.ExtractUserId(User);
+            var restaurant = (Restaurant?)await _context.Restaurants.FindAsync(createOrder.RestaurantId);
+            if (restaurant == null) 
+                return NotFound("Invalid restaurant id");
+            await _context.Entry(restaurant).Reference(x => x.Owner).LoadAsync();
+            await _context.Entry(restaurant.Owner!).Reference(x => x.OutboundBlocks).LoadAsync();
+            if (restaurant.Owner!.OutboundBlocks!.Any(x => x.BlockedUserId == userId) {
+                return StatusCode(403, "User is blocked");
+            }
+
             // Link meals
             IEnumerable<Meal?> orderMeals =
                 (from mealId in createOrder.MealIds

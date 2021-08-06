@@ -27,7 +27,10 @@ namespace FoodDelivery.Controllers
         [Authorize(Roles = "CUSTOMER")]
         public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
         {
-            return await _context.Restaurants.ToListAsync();
+            var userId = Utilities.ExtractUserId(User);
+            var blockedBy = _context.Blocks.Where(x => x.BlockedUserId == userId).Select(x => x.BlockingUserId);
+
+            return await _context.Restaurants.Where(x => !blockedBy.Contains(x.OwnerUserId)).ToListAsync();
         }
 
         // GET: api/Restaurants
@@ -35,11 +38,14 @@ namespace FoodDelivery.Controllers
         [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
         public async Task<ActionResult<Restaurant>> GetRestaurant(long id)
         {
+            var userId = Utilities.ExtractUserId(User);
             var restaurant = (Restaurant?)await _context.Restaurants.FindAsync(id);
             if (restaurant == null)
-                return NotFound();
+                return NotFound("Invalid restaurant id");
             if (!User.IsInRole("CUSTOMER") && restaurant.OwnerUserId != Utilities.ExtractUserId(User))
-                return Forbid();
+                return StatusCode(403, "User does not have access to this restaurant");
+            if (await _context.Blocks.FindAsync(restaurant.OwnerUserId, userId) != null)
+                return StatusCode(403, "User is blocked");
 
             return restaurant;
         }
