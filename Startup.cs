@@ -36,7 +36,8 @@ namespace FoodDelivery
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddJsonOptions(opt => {
+                .AddJsonOptions(opt =>
+                {
                     opt.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                     opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 });
@@ -44,6 +45,31 @@ namespace FoodDelivery
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FoodDelivery", Version = "v1" });
+
+                // To Enable authorization using Swagger (JWT)  
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme. \n\n Enter 'Bearer' [space] and then your token in the text input below.\n\nExample: \"Bearer 12345abcdef\"",
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
 
             services.AddDbContext<FoodDeliveryContext>(options =>
@@ -103,7 +129,7 @@ namespace FoodDelivery
             {
                 var path = context.Request.Path.Value;
 
-                if (!(path?.StartsWith("/api") ?? false) && !Path.HasExtension(path) && context.Request.Method == "GET") 
+                if (!(path?.StartsWith("/api") ?? false) && !Path.HasExtension(path) && context.Request.Method == "GET")
                 {
                     context.Request.Path = "/index.html";
                 }
