@@ -12,7 +12,7 @@ namespace FoodDelivery.Db
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatusChange> OrderStatusChanges { get; set; }
         public DbSet<Restaurant> Restaurants { get; set; }
-        public DbSet<UserBlock> UserBlocks { get; set; }
+        public DbSet<Block> Blocks { get; set; }
 
         public FoodDeliveryContext(DbContextOptions options) : base(options) {
 
@@ -21,7 +21,11 @@ namespace FoodDelivery.Db
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             // Setup composite primary keys
             modelBuilder.Entity<OrderStatusChange>().HasKey(x => new { x.OrderId, x.Status });
-            modelBuilder.Entity<UserBlock>().HasKey(x => new { x.RestaurantId, x.UserId });
+            modelBuilder.Entity<Block>().HasKey(x => new { x.BlockingUserId, x.BlockedUserId });
+
+            // Setup default values for dates
+            modelBuilder.Entity<Order>().Property(x => x.CreatedAt).HasDefaultValueSql("now()");
+            modelBuilder.Entity<OrderStatusChange>().Property(x => x.At).HasDefaultValueSql("now()");
 
             base.OnModelCreating(modelBuilder);
         }

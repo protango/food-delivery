@@ -3,36 +3,23 @@ using System;
 using FoodDelivery.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FoodDelivery.Migrations
 {
     [DbContext(typeof(FoodDeliveryContext))]
-    partial class FoodDeliveryContextModelSnapshot : ModelSnapshot
+    [Migration("20210806081232_DefaultDateValues")]
+    partial class DefaultDateValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.8")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-            modelBuilder.Entity("FoodDelivery.Db.Block", b =>
-                {
-                    b.Property<string>("BlockingUserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("BlockedUserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("BlockingUserId", "BlockedUserId");
-
-                    b.HasIndex("BlockedUserId");
-
-                    b.ToTable("Blocks");
-                });
 
             modelBuilder.Entity("FoodDelivery.Db.Meal", b =>
                 {
@@ -202,6 +189,21 @@ namespace FoodDelivery.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("FoodDelivery.Db.UserBlock", b =>
+                {
+                    b.Property<long>("RestaurantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("RestaurantId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserBlocks");
+                });
+
             modelBuilder.Entity("MealOrder", b =>
                 {
                     b.Property<long>("MealsId")
@@ -347,25 +349,6 @@ namespace FoodDelivery.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("FoodDelivery.Db.Block", b =>
-                {
-                    b.HasOne("FoodDelivery.Db.User", "BlockedUser")
-                        .WithMany("InboundBlocks")
-                        .HasForeignKey("BlockedUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FoodDelivery.Db.User", "BlockingUser")
-                        .WithMany("OutboundBlocks")
-                        .HasForeignKey("BlockingUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BlockedUser");
-
-                    b.Navigation("BlockingUser");
-                });
-
             modelBuilder.Entity("FoodDelivery.Db.Meal", b =>
                 {
                     b.HasOne("FoodDelivery.Db.Restaurant", "Restaurant")
@@ -416,6 +399,25 @@ namespace FoodDelivery.Migrations
                         .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("FoodDelivery.Db.UserBlock", b =>
+                {
+                    b.HasOne("FoodDelivery.Db.Restaurant", "Restaurant")
+                        .WithMany()
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FoodDelivery.Db.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MealOrder", b =>
@@ -498,11 +500,7 @@ namespace FoodDelivery.Migrations
 
             modelBuilder.Entity("FoodDelivery.Db.User", b =>
                 {
-                    b.Navigation("InboundBlocks");
-
                     b.Navigation("Orders");
-
-                    b.Navigation("OutboundBlocks");
 
                     b.Navigation("Restaurants");
                 });
