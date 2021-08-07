@@ -14,7 +14,7 @@
       </div>
       <div class="card-footer text-muted" v-if="item.ownerUserId === userId">
         <router-link class="card-link" :to="`/dashboard/restaurant/${item.id}`">View orders</router-link>
-        <router-link class="card-link" :to="`/dashboard/new-restaurant/${item.id}`">Edit</router-link>
+        <router-link class="card-link" :to="`/dashboard/edit-restaurant/${item.id}`">Edit</router-link>
         <a class="card-link text-danger" @click="deleteRestaurant(item.id)">Delete</a>
       </div>
     </div>
