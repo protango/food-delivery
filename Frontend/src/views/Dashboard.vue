@@ -68,7 +68,9 @@
         </div>
       </nav>
 
-      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 position-relative">
+      <div class="side-spacer col-md-3 col-lg-2 d-md-block collapse"></div>
+
+      <main class="main-view position-relative">
         <router-view></router-view>
       </main>
     </div>
@@ -80,9 +82,18 @@
     font-size: .875rem;
   }
 
+  .main-view {
+    width: auto !important;
+    flex-grow: 1;
+  }
+
   /*
   * Sidebar
   */
+
+  .side-spacer {
+    min-width: 225px;
+  }
 
   .sidebar {
     min-width: 225px;
