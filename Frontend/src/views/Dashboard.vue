@@ -22,41 +22,23 @@
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
         <div class="position-sticky pt-3">
           <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">
-                <span data-feather="home"></span>
-                Dashboard
-              </a>
+            <li v-if="isCustomer" class="nav-item">
+              <router-link class="nav-link" to="order">
+                <i class="fas fa-shopping-basket"></i>
+                Order food
+              </router-link>
+            </li>
+            <li v-if="isOwner" class="nav-item">
+              <router-link class="nav-link" to="restaurants">
+                <i class="fas fa-utensils"></i>
+                Restaurants
+              </router-link>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">
+              <router-link class="nav-link" to="orders">
                 <i class="fas fa-file-invoice-dollar"></i>
-                Orders
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="shopping-cart"></span>
-                Products
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="users"></span>
-                Customers
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="bar-chart-2"></span>
-                Reports
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="layers"></span>
-                Integrations
-              </a>
+                {{isCustomer ? 'Past' : ''}} Orders
+              </router-link>
             </li>
           </ul>
 
@@ -70,8 +52,14 @@
                 Manage account
               </a>
             </li>
-            <li class="nav-item">
+            <li v-if="isOwner" class="nav-item">
               <a class="nav-link" href="#">
+                <i class="fas fa-ban"></i>
+                Blocked users
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" @click="logout">
                 <i class="fas fa-sign-out-alt"></i>
                 Sign out
               </a>
@@ -123,7 +111,7 @@
     height: calc(100vh - 48px);
     padding-top: .5rem;
     overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    overflow-y: auto;
   }
 
   .sidebar .nav-link {
@@ -132,20 +120,12 @@
     i {
       margin-right: 5px;
     }
-  }
-
-  .sidebar .nav-link .feather {
-    margin-right: 4px;
-    color: #727272;
-  }
-
-  .sidebar .nav-link.active {
-    color: #2470dc;
-  }
-
-  .sidebar .nav-link:hover .feather,
-  .sidebar .nav-link.active .feather {
-    color: inherit;
+    &.active {
+      color: #2470dc;
+    }
+    a {
+      cursor: pointer;
+    }
   }
 
   .sidebar-heading {
@@ -200,14 +180,29 @@
 import { AuthService } from '@/services/authService';
 import { Vue } from 'vue-class-component';
 export default class Dashboard extends Vue {
-  public get username () {
-    return AuthService.loggedInUser!.username;
+  public isCustomer!: boolean;
+  public isOwner!: boolean;
+
+  public get username (): string {
+    const lgi = AuthService.loggedInUser;
+    if (!lgi) {
+      this.$router.push('/');
+      return '';
+    }
+    return lgi.username;
   }
 
   public beforeCreate (): void {
     if (!AuthService.loggedInUser || AuthService.loggedInUser.isExpired) {
       this.$router.push('/');
+      return;
     }
+    this.isCustomer = AuthService.loggedInUser.roles.includes('CUSTOMER');
+    this.isOwner = AuthService.loggedInUser.roles.includes('RESTAURANT_OWNER');
+  }
+
+  public logout (): void {
+    AuthService.logout();
   }
 }
 </script>
