@@ -13,8 +13,8 @@
         <div class="container-fluid py-5">
           <h1 class="display-5 fw-bold">Food Delivery Co</h1>
           <p class="col-md-8 fs-4">We deliver high quality food, right to your door! Sign up today to get two meals for the price of two!</p>
-          <button class="btn btn-primary btn-lg me-1" type="button" @click="login">Sign up</button>
-          <button class="btn btn-outline-secondary btn-lg" type="button" @click="login">Sign in</button>
+          <button class="btn btn-primary btn-lg me-1" type="button" @click="signin.show(true, 'CUSTOMER')">Sign up</button>
+          <button class="btn btn-outline-secondary btn-lg" type="button" @click="signin.show(false)">Sign in</button>
         </div>
       </div>
 
@@ -22,8 +22,8 @@
         <div class="text-white">
           <h2>Are you a restaurant owner?</h2>
           <p>We're always looking for new restaurants to come into our network, register now!</p>
-          <button class="btn btn-outline-light me-1 mb-1" type="button">Register as a restaurant</button>
-          <button class="btn btn-outline-light mb-1" type="button">Sign in as a restaurant</button>
+          <button class="btn btn-outline-light me-1 mb-1" type="button" @click="signin.show(true, 'RESTAURANT_OWNER')">Register as a restaurant</button>
+          <button class="btn btn-outline-light mb-1" type="button" @click="signin.show(false)">Sign in as a restaurant</button>
         </div>
       </div>
 
@@ -56,10 +56,6 @@ export default class Home extends Vue {
 
   get signin (): SignInUp {
     return this.$refs.signin as SignInUp;
-  }
-
-  login (): void {
-    this.signin.show();
   }
 }
 </script>
