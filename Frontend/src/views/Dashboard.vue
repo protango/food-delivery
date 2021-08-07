@@ -1,14 +1,19 @@
 <template>
   <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Company name</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">
+      <img src="../assets/hamburger.png" class="logo" />
+      <span>Food Delivery Co</span>
+    </a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-    <div class="navbar-nav">
+    <div class="navbar-nav d-none d-md-block">
       <div class="nav-item text-nowrap">
-        <a class="nav-link px-3" href="#">Sign out</a>
+        <span class="text-white-50 px-3">Signed in as: {{ username }}</span>
       </div>
+    </div>
+    <div class="d-md-none w-100 bg-light text-muted py-1">
+      <span class="px-3">Signed in as: {{ username }}</span>
     </div>
   </header>
 
@@ -56,34 +61,19 @@
           </ul>
 
           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-            <span>Saved reports</span>
-            <a class="link-secondary" href="#" aria-label="Add a new report">
-              <span data-feather="plus-circle"></span>
-            </a>
+            <span>Account management</span>
           </h6>
           <ul class="nav flex-column mb-2">
             <li class="nav-item">
               <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                Current month
+                <i class="fas fa-user-alt"></i>
+                Manage account
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                Last quarter
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                Social engagement
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                Year-end sale
+                <i class="fas fa-sign-out-alt"></i>
+                Sign out
               </a>
             </li>
           </ul>
@@ -102,17 +92,12 @@
     font-size: .875rem;
   }
 
-  .feather {
-    width: 16px;
-    height: 16px;
-    vertical-align: text-bottom;
-  }
-
   /*
   * Sidebar
   */
 
   .sidebar {
+    min-width: 225px;
     position: fixed;
     top: 0;
     /* rtl:raw:
@@ -144,6 +129,9 @@
   .sidebar .nav-link {
     font-weight: 500;
     color: #333;
+    i {
+      margin-right: 5px;
+    }
   }
 
   .sidebar .nav-link .feather {
@@ -170,11 +158,19 @@
   */
 
   .navbar-brand {
-    padding-top: .75rem;
-    padding-bottom: .75rem;
+    min-width: 225px;
+    padding-top: 9px !important;
+    padding-bottom: 9px !important;
     font-size: 1rem;
     background-color: rgba(0, 0, 0, .25);
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+    .logo {
+      width: 27px;
+      height: 27px;
+    }
+    &>* {
+      vertical-align: bottom;
+    }
   }
 
   .navbar .navbar-toggler {
@@ -199,3 +195,19 @@
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
   }
 </style>
+
+<script lang="ts">
+import { AuthService } from '@/services/authService';
+import { Vue } from 'vue-class-component';
+export default class Dashboard extends Vue {
+  public get username () {
+    return AuthService.loggedInUser!.username;
+  }
+
+  public beforeCreate (): void {
+    if (!AuthService.loggedInUser || AuthService.loggedInUser.isExpired) {
+      this.$router.push('/');
+    }
+  }
+}
+</script>
