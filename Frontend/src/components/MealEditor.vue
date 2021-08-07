@@ -84,7 +84,7 @@ export default class MealEditor extends Vue {
     } else {
       this.newMealLoading = true;
       await MealService.delete(meal.id);
-      await this.beforeCreate();
+      this.meals = await MealService.getForRestaurant(this.restaurantId);
       this.newMealLoading = false;
     }
 
@@ -100,7 +100,7 @@ export default class MealEditor extends Vue {
       if (this.restaurantId != null) {
         this.newMealLoading = false;
         await MealService.create(this.restaurantId, this.newMeal);
-        await this.beforeCreate();
+        this.meals = await MealService.getForRestaurant(this.restaurantId);
         this.newMealLoading = false;
       } else {
         this.meals.push({ ...this.newMeal, id: 0, restaurantId: 0 });

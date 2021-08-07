@@ -38,7 +38,7 @@
         </h2>
         <div id="panelOrders" class="accordion-collapse collapse show">
           <div class="accordion-body">
-            <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+            <order-editor :restaurantId="restaurantId"></order-editor>
           </div>
         </div>
       </div>
@@ -56,10 +56,12 @@ import { Restaurant, RestaurantService } from '../services/restaurantService';
 import { Order, OrderService } from '../services/orderService';
 import LoadingOverlay from '../components/LoadingOverlay.vue';
 import MealEditor from '../components/MealEditor.vue';
+import OrderEditor from '../components/OrderEditor.vue';
 @Options({
   components: {
     LoadingOverlay,
-    MealEditor
+    MealEditor,
+    OrderEditor
   }
 })
 export default class Restaurants extends Vue {

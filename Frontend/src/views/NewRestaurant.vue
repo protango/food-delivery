@@ -1,5 +1,5 @@
 <template>
-  <h1>New Restaurant</h1>
+  <h1>{{restaurantId != null ? "Edit" : "New"}} Restaurant</h1>
   <form @submit="newRestaurantSubmit" :class="{ 'was-validated': wasValidated }" novalidate>
     <div class="mb-3">
       <label for="resName" class="form-label">Restaurant name</label>
@@ -11,11 +11,11 @@
     </div>
     <div class="mb-3">
       <label class="form-label">Meals offered</label>
-      <MealEditor @mealsChanged="newRestaurant.meals = $event"></MealEditor>
+      <MealEditor @mealsChanged="newRestaurant.meals = $event" :restaurantId="restaurantId"></MealEditor>
     </div>
     <button type="submit" class="btn btn-primary" :disabled="loading">
       <span class="spinner-border spinner-border-sm" role="status" v-if="loading"></span>
-      Submit
+      {{restaurantId != null ? "Save" : "Add"}}
     </button>
   </form>
 </template>
@@ -39,6 +39,7 @@ import MealEditor from '../components/MealEditor.vue';
 export default class NewRestaurant extends AuthenticatedVue {
   public loading = false;
   public wasValidated = false;
+  public restaurantId?: number;
   public newRestaurant: CreateRestaurant = {
     name: '',
     description: '',
@@ -54,9 +55,32 @@ export default class NewRestaurant extends AuthenticatedVue {
     if (target.reportValidity()) {
       this.wasValidated = false;
       this.loading = true;
-      const newRestaurant = await RestaurantService.create(this.newRestaurant);
-      this.loading = false;
-      this.$router.push('/dashboard/restaurant/' + newRestaurant.id);
+      if (this.restaurantId == null) {
+        const newRestaurant = await RestaurantService.create(this.newRestaurant);
+        this.loading = false;
+        this.$router.push('/dashboard/restaurant/' + newRestaurant.id);
+      } else {
+        await RestaurantService.update(this.restaurantId, this.newRestaurant);
+        this.loading = false;
+        this.$router.push('/dashboard/restaurant/' + this.restaurantId);
+      }
+    }
+  }
+
+  public async beforeCreate (): Promise<void> {
+    try {
+      this.restaurantId = Number(this.$route.params.id);
+      if (isNaN(this.restaurantId)) {
+        this.restaurantId = undefined;
+        return;
+      }
+
+      this.newRestaurant = {
+        ...await RestaurantService.get(this.restaurantId),
+        meals: []
+      };
+    } catch {
+      this.$router.push('/');
     }
   }
 }
