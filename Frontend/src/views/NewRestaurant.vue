@@ -9,7 +9,10 @@
       <label for="resName" class="form-label">Description</label>
       <textarea class="form-control" id="resName"></textarea>
     </div>
-    <MealEditor class="mb-3"></MealEditor>
+    <div class="mb-3">
+      <label class="form-label">Meals offered</label>
+      <MealEditor></MealEditor>
+    </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </template>

@@ -2,8 +2,8 @@
   <loading-overlay v-if="loading" message="Loading"></loading-overlay>
   <h1>Restaurants</h1>
   <button type="button" class="btn btn-primary mb-2"><i class="fas fa-plus"></i> New Restaurant</button>
-  <div class="d-flex">
-    <div class="card" style="width: 18rem;" v-for="item in restaurants" :key="item.id">
+  <div class="d-flex" style="flex-wrap: wrap;">
+    <div class="card restaurant-card" v-for="item in restaurants" :key="item.id">
       <div class="card-img-top bg-secondary text-light">
         <i class="fas" :class="getFoodIcon(item.id)"></i>
       </div>
@@ -33,6 +33,11 @@
   .card {
     margin-right: 10px;
     margin-bottom: 10px;
+  }
+
+  .restaurant-card {
+    width: 18rem;
+    min-width: 300px !important;
   }
 </style>
 

@@ -18,7 +18,7 @@
   </header>
 
   <div class="container-fluid">
-    <div class="row">
+    <div class="row" style="flex-wrap: nowrap">
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
         <div class="position-sticky pt-3">
           <ul class="nav flex-column">
@@ -85,6 +85,7 @@
   .main-view {
     width: auto !important;
     flex-grow: 1;
+    flex-shrink: unset !important;
   }
 
   /*
@@ -133,9 +134,6 @@
     }
     &.active {
       color: #2470dc;
-    }
-    a {
-      cursor: pointer;
     }
   }
 
