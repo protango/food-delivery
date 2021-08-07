@@ -40,7 +40,7 @@ export default class LoadingOverlay extends Vue {
   public message?: string;
   public height = 0;
 
-  mounted () {
+  public mounted (): void {
     const rect = this.$el.getBoundingClientRect() as DOMRect;
     this.height = window.innerHeight - rect.y;
   }
