@@ -5,4 +5,5 @@ export default class AuthenticatedVue extends Vue {
     public isCustomer: boolean = AuthService.loggedInUser!.roles.includes('CUSTOMER');
     public isOwner: boolean = AuthService.loggedInUser!.roles.includes('RESTAURANT_OWNER');
     public username: string = AuthService.loggedInUser!.username;
+    public userId: string = AuthService.loggedInUser!.id;
 }

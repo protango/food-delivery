@@ -23,19 +23,19 @@
         <div class="position-sticky pt-3">
           <ul class="nav flex-column">
             <li v-if="isCustomer" class="nav-item">
-              <router-link class="nav-link" to="order">
+              <router-link class="nav-link" to="/dashboard/order">
                 <i class="fas fa-shopping-basket"></i>
                 Order food
               </router-link>
             </li>
             <li v-if="isOwner" class="nav-item">
-              <router-link class="nav-link" to="restaurants">
+              <router-link class="nav-link" to="/dashboard/restaurants">
                 <i class="fas fa-utensils"></i>
                 Restaurants
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="orders">
+              <router-link class="nav-link" to="/dashboard/orders">
                 <i class="fas fa-file-invoice-dollar"></i>
                 {{isCustomer ? 'Past' : ''}} Orders
               </router-link>
@@ -68,7 +68,7 @@
         </div>
       </nav>
 
-      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 position-relative">
         <router-view></router-view>
       </main>
     </div>

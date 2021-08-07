@@ -1,17 +1,22 @@
 <template>
+  <loading-overlay v-if="loading" message="Loading"></loading-overlay>
   <h1>Restaurants</h1>
-  <div class="card" style="width: 18rem;">
-    <div class="card-img-top bg-secondary text-light">
-      <i class="fas" :class="getRandomFoodIcon()"></i>
-    </div>
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
-    <div class="card-body">
-      <a href="#" class="card-link">Card link</a>
-      <a href="#" class="card-link">Another link</a>
+  <button type="button" class="btn btn-primary mb-2"><i class="fas fa-plus"></i> New Restaurant</button>
+  <div class="d-flex">
+    <div class="card" style="width: 18rem;" v-for="item in restaurants" :key="item.id">
+      <div class="card-img-top bg-secondary text-light">
+        <i class="fas" :class="getFoodIcon(item.id)"></i>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{item.name}}</h5>
+        <p class="card-text">{{item.description}}</p>
+        <a href="#" class="btn btn-primary">Place order</a>
+      </div>
+      <div class="card-footer text-muted" v-if="item.ownerUserId === userId">
+        <a href="#" class="card-link">View orders</a>
+        <a href="#" class="card-link">Edit</a>
+        <a href="#" class="card-link text-danger">Delete</a>
+      </div>
     </div>
   </div>
 </template>
@@ -24,12 +29,25 @@
       font-size: 50px;
     }
   }
+
+  .card {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
 </style>
 
 <script lang="ts">
+import { Options } from 'vue-class-component';
 import AuthenticatedVue from '../components/AuthenticatedVue';
+import { Restaurant, RestaurantService } from '../services/restaurantService';
+import LoadingOverlay from '../components/LoadingOverlay.vue';
+@Options({
+  components: {
+    LoadingOverlay
+  }
+})
 export default class Restaurants extends AuthenticatedVue {
-  foodIcons: string[] = [
+  public foodIcons: string[] = [
     'fa-utensils',
     'fa-hamburger',
     'fa-pizza-slice',
@@ -46,11 +64,25 @@ export default class Restaurants extends AuthenticatedVue {
     'fa-apple-alt'
   ];
 
-  public getRandomFoodIcon (): Record<string, boolean> {
-    const icon = this.foodIcons[Math.floor(Math.random() * this.foodIcons.length)];
+  public loading = true;
+  public restaurants: Restaurant[] = [];
+
+  private iconRestaurantMap: Record<number, string> = {};
+
+  public getFoodIcon (restaurantId: number): Record<string, boolean> {
+    let icon: string = this.iconRestaurantMap[restaurantId];
+    if (!icon) {
+      icon = this.foodIcons[Math.floor(Math.random() * this.foodIcons.length)];
+      this.iconRestaurantMap[restaurantId] = icon;
+    }
     return {
       [icon]: true
     };
+  }
+
+  public async beforeCreate (): Promise<void> {
+    this.restaurants = await RestaurantService.get();
+    this.loading = false;
   }
 }
 </script>

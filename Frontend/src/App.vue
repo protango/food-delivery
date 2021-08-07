@@ -12,4 +12,8 @@ h1 {
   margin-top: 10px !important;
   margin-bottom: 20px !important;
 }
+
+.btn i {
+  margin-right: 5px;
+}
 </style>
