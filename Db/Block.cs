@@ -20,5 +20,7 @@ namespace FoodDelivery.Db
         [ForeignKey("BlockedUserId")]
         [InverseProperty("InboundBlocks")]
         public User? BlockedUser { get; set; }
+
+        public string? BlockedUsername { get => BlockedUser?.UserName; }
     }
 }

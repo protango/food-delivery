@@ -32,6 +32,7 @@ namespace FoodDelivery.Controllers
             return await _context.Orders
                 .Where(x => x.UserId == userId)
                 .Include(x => x.User)
+                .Include(x => x.Meals)
                 .ToListAsync();
         }
 
@@ -48,6 +49,7 @@ namespace FoodDelivery.Controllers
             return await _context.Orders
                 .Where(x => x.RestaurantId == id)
                 .Include(x => x.User)
+                .Include(x => x.Meals)
                 .ToListAsync();
         }
 
@@ -98,6 +100,7 @@ namespace FoodDelivery.Controllers
             });
             await _context.SaveChangesAsync();
             await _context.Entry(order.Entity).Reference(x => x.User).LoadAsync();
+            await _context.Entry(order.Entity).Collection(x => x.Meals).LoadAsync();
             return CreatedAtAction("PostOrder", order.Entity);
         }
 

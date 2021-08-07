@@ -25,12 +25,12 @@ namespace FoodDelivery.Controllers
         // GET: api/UserBlocks
         [HttpGet]
         [Authorize(Roles = "RESTAURANT_OWNER")]
-        public async Task<ActionResult<IEnumerable<string>>> GetBlocks()
+        public async Task<ActionResult<IEnumerable<Block>>> GetBlocks()
         {
             var userId = Utilities.ExtractUserId(User);
             return await _context.Blocks
                 .Where(x => x.BlockingUserId == userId)
-                .Select(x => x.BlockedUser!.Id)
+                .Include(x => x.BlockedUser)
                 .ToListAsync();
         }
 
@@ -63,13 +63,12 @@ namespace FoodDelivery.Controllers
         [ProducesResponseType(204)]
         [HttpDelete("{id}")]
         [Authorize(Roles = "RESTAURANT_OWNER")]
-        public async Task<IActionResult> DeleteUserBlock(long id)
+        public async Task<IActionResult> DeleteUserBlock(string userId)
         {
-            var block = await _context.Blocks.FindAsync(id);
+            var myUserId = Utilities.ExtractUserId(User);
+            var block = await _context.Blocks.FindAsync(myUserId, userId);
             if (block == null)
-                return NotFound("Invalid id");
-            if (block.BlockingUserId != Utilities.ExtractUserId(User))
-                return StatusCode(403, "User does not have access to this data");
+                return NotFound("Invalid user id");
 
             _context.Blocks.Remove(block);
             await _context.SaveChangesAsync();
