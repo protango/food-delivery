@@ -35,6 +35,7 @@ class UserData {
 export abstract class AuthService {
   public static loggedInUser?: UserData = AuthService.loginFromStorage();
   private static renewalTimer?: number;
+  private static active = true;
 
   private static loginFromStorage (): UserData | undefined {
     const token = localStorage.getItem('jwt');
@@ -68,12 +69,16 @@ export abstract class AuthService {
       if (this.loggedInUser !== userData) throw new Error('Session was replaced without canceling old session');
       this.renewalTimer = undefined;
       this.loggedInUser = undefined;
-      const response = await axios.get<{token: string, expiration: string}>('/api/Auth/Refresh');
-      const newUserData = new UserData(response.data.token);
-      this.startSession(newUserData);
+      if (this.active) {
+        this.active = false;
+        const response = await axios.get<{token: string, expiration: string}>('/api/Auth/Refresh');
+        const newUserData = new UserData(response.data.token);
+        this.startSession(newUserData);
+      }
     }, msTillRenewal);
   }
 
+  /** Logs out of the current session */
   public static logout (): void {
     localStorage.removeItem('jwt');
     if (this.renewalTimer !== undefined) {
@@ -85,6 +90,7 @@ export abstract class AuthService {
     }
   }
 
+  /** Logs into a user account */
   public static async login (username: string, password: string): Promise<boolean> {
     try {
       const response = await axios.post<{token: string, expiration: string}>('/api/Auth/Login', {
@@ -100,5 +106,26 @@ export abstract class AuthService {
     } catch {
       return false;
     }
+  }
+
+  /** Registers a new user account and logs in */
+  public static async register (username: string, password: string, role: string): Promise<boolean> {
+    try {
+      await axios.post('/api/Auth/Register', {
+        username,
+        password,
+        role
+      });
+      await this.login(username, password);
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Announce user activity, session may be cancelled if user activity is not announced within a token's expiry */
+  public static announceActive (): void {
+    this.active = true;
   }
 }
