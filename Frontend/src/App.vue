@@ -16,4 +16,8 @@ h1 {
 .btn i {
   margin-right: 5px;
 }
+
+a {
+  cursor: pointer;
+}
 </style>
