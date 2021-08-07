@@ -1,7 +1,7 @@
 <template>
   <loading-overlay v-if="loading" message="Loading"></loading-overlay>
   <h1>Restaurants</h1>
-  <button type="button" class="btn btn-primary mb-2"><i class="fas fa-plus"></i> New Restaurant</button>
+  <router-link class="btn btn-primary mb-2" v-if="isOwner" to="/dashboard/new-restaurant"><i class="fas fa-plus"></i> New Restaurant</router-link>
   <div class="d-flex" style="flex-wrap: wrap;">
     <div class="card restaurant-card" v-for="item in restaurants" :key="item.id">
       <div class="card-img-top bg-secondary text-light">
@@ -10,12 +10,12 @@
       <div class="card-body">
         <h5 class="card-title">{{item.name}}</h5>
         <p class="card-text">{{item.description}}</p>
-        <a href="#" class="btn btn-primary">Place order</a>
+        <router-link class="btn btn-primary" :to="`/dashboard/new-order/${item.id}`" v-if="isCustomer">Place order</router-link>
       </div>
       <div class="card-footer text-muted" v-if="item.ownerUserId === userId">
-        <a href="#" class="card-link">View orders</a>
-        <a href="#" class="card-link">Edit</a>
-        <a href="#" class="card-link text-danger">Delete</a>
+        <router-link class="card-link" :to="`/dashboard/restaurant/${item.id}`">View orders</router-link>
+        <router-link class="card-link" :to="`/dashboard/new-restaurant/${item.id}`">Edit</router-link>
+        <a class="card-link text-danger" @click="deleteRestaurant(item.id)">Delete</a>
       </div>
     </div>
   </div>
@@ -88,6 +88,16 @@ export default class Restaurants extends AuthenticatedVue {
   public async beforeCreate (): Promise<void> {
     this.restaurants = await RestaurantService.get();
     this.loading = false;
+  }
+
+  public async deleteRestaurant (restaurantId: number): Promise<void> {
+    this.loading = true;
+    try {
+      await RestaurantService.delete(restaurantId);
+      this.restaurants = await RestaurantService.get();
+    } finally {
+      this.loading = false;
+    }
   }
 }
 </script>

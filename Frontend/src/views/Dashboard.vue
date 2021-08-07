@@ -23,7 +23,7 @@
         <div class="position-sticky pt-3">
           <ul class="nav flex-column">
             <li v-if="isCustomer" class="nav-item">
-              <router-link class="nav-link" to="/dashboard/order">
+              <router-link class="nav-link" to="/dashboard/new-order">
                 <i class="fas fa-shopping-basket"></i>
                 Order food
               </router-link>
@@ -46,17 +46,11 @@
             <span>Account management</span>
           </h6>
           <ul class="nav flex-column mb-2">
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <i class="fas fa-user-alt"></i>
-                Manage account
-              </a>
-            </li>
             <li v-if="isOwner" class="nav-item">
-              <a class="nav-link" href="#">
+              <router-link class="nav-link" to="/dashboard/blocks">
                 <i class="fas fa-ban"></i>
                 Blocked users
-              </a>
+              </router-link>
             </li>
             <li class="nav-item">
               <a class="nav-link" @click="logout">
@@ -208,6 +202,11 @@ export default class Dashboard extends Vue {
     }
     this.isCustomer = AuthService.loggedInUser.roles.includes('CUSTOMER');
     this.isOwner = AuthService.loggedInUser.roles.includes('RESTAURANT_OWNER');
+
+    if (this.$route.path.endsWith('/dashboard')) {
+      if (this.isOwner) this.$router.push('/dashboard/restaurants');
+      else this.$router.push('/dashboard/new-order');
+    }
   }
 
   public logout (): void {

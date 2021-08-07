@@ -30,6 +30,11 @@ const routes: Array<RouteRecordRaw> = [
         component: NewRestaurant
       },
       {
+        path: 'edit-restaurant/:id',
+        name: 'EditRestaurant',
+        component: NewRestaurant
+      },
+      {
         path: 'blocks',
         name: 'Blocks',
         component: Blocks
@@ -40,12 +45,17 @@ const routes: Array<RouteRecordRaw> = [
         component: NewOrder
       },
       {
+        path: 'new-order',
+        name: 'NewOrderWithoutRestaurant',
+        component: Restaurants
+      },
+      {
         path: 'orders',
         name: 'Orders',
         component: Orders
       },
       {
-        path: 'restautant',
+        path: 'restaurant/:id',
         name: 'Restaurant',
         component: Restaurant
       }
