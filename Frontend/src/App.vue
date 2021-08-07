@@ -2,6 +2,9 @@
   <router-view></router-view>
 </template>
 
-<style lang="css">
-
+<style lang="scss">
+$fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+@import '~@fortawesome/fontawesome-free/scss/solid';
+@import '~@fortawesome/fontawesome-free/scss/regular';
 </style>
