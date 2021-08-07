@@ -12,13 +12,23 @@
 </template>
 
 <style scoped lang="scss">
+  @keyframes fadein {
+      from {
+          opacity:0;
+      }
+      to {
+          opacity:1;
+      }
+  }
+
   .overlay {
+    animation: fadein 0.5s;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba($color: #000000, $alpha: 0.75);
+    background: rgba($color: #000000, $alpha: 0.5);
     z-index: 9;
 
     .spinner-border {
