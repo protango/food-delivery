@@ -45,6 +45,7 @@
 <script lang="ts">
 import SignInUp from '@/components/SignInUp.vue';
 import { Options, Vue } from 'vue-class-component';
+import { AuthService } from '../services/authService';
 
 @Options({
   components: {
@@ -56,6 +57,12 @@ export default class Home extends Vue {
 
   get signin (): SignInUp {
     return this.$refs.signin as SignInUp;
+  }
+
+  public beforeCreate (): void {
+    if (AuthService.loggedInUser && !AuthService.loggedInUser.isExpired) {
+      this.$router.push('/dashboard');
+    }
   }
 }
 </script>
