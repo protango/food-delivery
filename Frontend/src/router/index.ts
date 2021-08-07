@@ -3,6 +3,10 @@ import Home from '../views/Home.vue';
 import Dashboard from '../views/Dashboard.vue';
 import Restaurants from '../views/Restaurants.vue';
 import NewRestaurant from '../views/NewRestaurant.vue';
+import Restaurant from '../views/Restaurant.vue';
+import Blocks from '../views/Blocks.vue';
+import NewOrder from '../views/NewOrder.vue';
+import Orders from '../views/Orders.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -24,6 +28,26 @@ const routes: Array<RouteRecordRaw> = [
         path: 'new-restaurant',
         name: 'NewRestaurant',
         component: NewRestaurant
+      },
+      {
+        path: 'blocks',
+        name: 'Blocks',
+        component: Blocks
+      },
+      {
+        path: 'new-order/:restaurantId',
+        name: 'NewOrder',
+        component: NewOrder
+      },
+      {
+        path: 'orders',
+        name: 'Orders',
+        component: Orders
+      },
+      {
+        path: 'restautant',
+        name: 'Restaurant',
+        component: Restaurant
       }
     ]
   }
