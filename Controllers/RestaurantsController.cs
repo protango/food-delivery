@@ -24,13 +24,22 @@ namespace FoodDelivery.Controllers
 
         // GET: api/Restaurants
         [HttpGet]
-        [Authorize(Roles = "CUSTOMER")]
+        [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
         public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
         {
             var userId = Utilities.ExtractUserId(User);
-            var blockedBy = _context.Blocks.Where(x => x.BlockedUserId == userId).Select(x => x.BlockingUserId);
+            if (User.IsInRole("CUSTOMER"))
+            {
+                var blockedBy = _context.Blocks.Where(x => x.BlockedUserId == userId).Select(x => x.BlockingUserId);
 
-            return await _context.Restaurants.Where(x => !blockedBy.Contains(x.OwnerUserId)).ToListAsync();
+                return await _context.Restaurants.Where(x => !blockedBy.Contains(x.OwnerUserId)).ToListAsync();
+            }
+            else if (User.IsInRole("RESTAURANT_OWNER")) 
+            {
+                return await _context.Restaurants.Where(x => x.OwnerUserId == userId).ToListAsync();
+            }
+            throw new Exception("Invalid Role");
+
         }
 
         // GET: api/Restaurants
