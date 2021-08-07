@@ -11,13 +11,13 @@ interface JwtData {
   exp: number;
 }
 
-class UserData {
+export class UserData {
   public username: string;
   public token: string;
   public expiry: Date;
   public roles: string[];
   public id: string;
-  public get isExpired () {
+  public get isExpired (): boolean {
     return this.expiry < new Date();
   }
 
