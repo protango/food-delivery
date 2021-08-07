@@ -25,8 +25,8 @@ export abstract class RestaurantService {
     ).data;
   }
 
-  public static async create (restaurant: CreateRestaurant): Promise<void> {
-    await axios.post<void>('/api/Restaurants', restaurant);
+  public static async create (restaurant: CreateRestaurant): Promise<Restaurant> {
+    return (await axios.post<Restaurant>('/api/Restaurants', restaurant)).data;
   }
 
   public static async update (id: number, restaurant: Omit<CreateRestaurant, 'meals'>): Promise<void> {
