@@ -7,15 +7,15 @@ export interface Block {
 }
 
 export abstract class BlockService {
-  public async get (): Promise<Block[]> {
+  public static async get (): Promise<Block[]> {
     return (await axios.get<Block[]>('/api/Blocks')).data;
   }
 
-  public async create (userId: string): Promise<void> {
+  public static async create (userId: string): Promise<void> {
     await axios.post<void>('/api/Blocks/' + userId);
   }
 
-  public async delete (userId: string): Promise<void> {
+  public static async delete (userId: string): Promise<void> {
     await axios.delete<void>('/api/Blocks/' + userId);
   }
 }

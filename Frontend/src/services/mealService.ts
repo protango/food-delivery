@@ -15,19 +15,19 @@ export interface Meal {
 }
 
 export abstract class MealService {
-  public async getForRestaurant (restaurantId: number): Promise<Meal[]> {
+  public static async getForRestaurant (restaurantId: number): Promise<Meal[]> {
     return (await axios.get<Meal[]>('/api/Meals/ForRestaurant/' + restaurantId)).data;
   }
 
-  public async update (id: number, meal: UpsertMeal): Promise<void> {
+  public static async update (id: number, meal: UpsertMeal): Promise<void> {
     await axios.put<void>('/api/Meals/' + id, meal);
   }
 
-  public async delete (id: number): Promise<void> {
+  public static async delete (id: number): Promise<void> {
     await axios.delete<void>('/api/Meals/' + id);
   }
 
-  public async create (restaurantId: number, meal: UpsertMeal): Promise<void> {
+  public static async create (restaurantId: number, meal: UpsertMeal): Promise<void> {
     await axios.post<void>('/api/Meals/' + restaurantId, meal);
   }
 }

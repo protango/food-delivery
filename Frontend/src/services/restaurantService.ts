@@ -15,9 +15,9 @@ export interface CreateRestaurant {
 }
 
 export abstract class RestaurantService {
-  public async get (): Promise<Restaurant[]>;
-  public async get (id: number): Promise<Restaurant>;
-  public async get (id?: number): Promise<Restaurant | Restaurant[]> {
+  public static async get (): Promise<Restaurant[]>;
+  public static async get (id: number): Promise<Restaurant>;
+  public static async get (id?: number): Promise<Restaurant | Restaurant[]> {
     return (
       await axios.get<Restaurant[] | Restaurant>(
         '/api/Restaurants' + (id != null ? '/' + id : '')
@@ -25,15 +25,15 @@ export abstract class RestaurantService {
     ).data;
   }
 
-  public async create (restaurant: CreateRestaurant): Promise<void> {
+  public static async create (restaurant: CreateRestaurant): Promise<void> {
     await axios.post<void>('/api/Restaurants', restaurant);
   }
 
-  public async update (id: number, restaurant: Omit<CreateRestaurant, 'meals'>): Promise<void> {
+  public static async update (id: number, restaurant: Omit<CreateRestaurant, 'meals'>): Promise<void> {
     await axios.put<void>('/api/Restaurants/' + id, restaurant);
   }
 
-  public async delete (id: number): Promise<void> {
+  public static async delete (id: number): Promise<void> {
     await axios.delete<void>('/api/Restaurants/' + id);
   }
 }

@@ -26,19 +26,19 @@ export interface CreateOrder {
 }
 
 export abstract class OrderService {
-  public async get (): Promise<Order[]> {
+  public static async get (): Promise<Order[]> {
     return (await axios.get<Order[]>('/api/Orders')).data;
   }
 
-  public async create (order: CreateOrder): Promise<Order> {
+  public static async create (order: CreateOrder): Promise<Order> {
     return (await axios.post<Order>('/api/Orders', order)).data;
   }
 
-  public async getForRestaurant (restaurantId: number): Promise<Order[]> {
+  public static async getForRestaurant (restaurantId: number): Promise<Order[]> {
     return (await axios.get<Order[]>('/api/Orders/ForRestaurant/' + restaurantId)).data;
   }
 
-  public async changeStatus (orderId: number, status: OrderStatus): Promise<void> {
+  public static async changeStatus (orderId: number, status: OrderStatus): Promise<void> {
     await axios.put<void>(`/api/Orders/Status/${orderId}/${status}`);
   }
 }
