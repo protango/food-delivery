@@ -37,7 +37,7 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/dashboard/orders">
                 <i class="fas fa-file-invoice-dollar"></i>
-                {{isCustomer ? 'Past' : ''}} Orders
+                {{isCustomer ? 'Past' : 'All'}} Orders
               </router-link>
             </li>
           </ul>
