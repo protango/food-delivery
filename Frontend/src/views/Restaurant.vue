@@ -2,20 +2,46 @@
   <loading-overlay v-if="!restaurant" message="Loading"></loading-overlay>
   <div v-if="restaurant">
     <h1>Viewing Restaurant</h1>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">{{restaurant.name}}</h5>
-        <p class="card-text">{{restaurant.description}}</p>
-        <router-link :to="`/dashboard/edit-restaurant/${restaurant.id}`" class="btn btn-primary me-1">Edit restaurant</router-link>
-        <a class="btn btn-danger" @click="deleteRestaurant">Delete restaurant</a>
+    <div class="accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelDetails">
+            Restaurant details
+          </button>
+        </h2>
+        <div id="panelDetails" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+            <h5>{{restaurant.name}}</h5>
+            <p>{{restaurant.description}}</p>
+            <router-link :to="`/dashboard/edit-restaurant/${restaurant.id}`" class="btn btn-primary me-1">Edit restaurant</router-link>
+            <a class="btn btn-danger" @click="deleteRestaurant">Delete restaurant</a>
+          </div>
+        </div>
       </div>
-      <div class="card-header border-top">
-        Orders for this restaurant
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelMenu">
+            Menu
+          </button>
+        </h2>
+        <div id="panelMenu" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+            <meal-editor :restaurantId="restaurantId" :readonly="true"></meal-editor>
+          </div>
+        </div>
       </div>
-      <ul class="list-group list-group-flush">
-        <li v-if="!orders.length" class="list-group-item text-muted">No orders yet</li>
-        <li v-for="order in orders" :key="order.id" class="list-group-item">{{order.id}}</li>
-      </ul>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelOrders">
+            Orders for this restaurant
+          </button>
+        </h2>
+        <div id="panelOrders" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+            <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -29,9 +55,11 @@ import { Vue, Options } from 'vue-class-component';
 import { Restaurant, RestaurantService } from '../services/restaurantService';
 import { Order, OrderService } from '../services/orderService';
 import LoadingOverlay from '../components/LoadingOverlay.vue';
+import MealEditor from '../components/MealEditor.vue';
 @Options({
   components: {
-    LoadingOverlay
+    LoadingOverlay,
+    MealEditor
   }
 })
 export default class Restaurants extends Vue {

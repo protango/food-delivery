@@ -1,5 +1,5 @@
 <template>
-  <div ref="modal" class="modal fade" tabindex="-1" id="newMealModal">
+  <div ref="modal" class="modal fade" tabindex="-1" id="newMealModal" v-if="!readonly">
     <div class="modal-dialog">
       <form class="modal-content" @submit="newMealSubmit" :class="{ 'was-validated': newMealFormValidated }" novalidate>
         <div class="modal-header">
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <div class="meal-container card">
+  <div class="meal-container card" :class="{readonly}">
     <div class="card-body">
       <span v-if="meals.length === 0" class="text-muted">No meals</span>
       <div class="card meal-card" v-for="(meal, index) in meals" :key="index">
@@ -39,11 +39,11 @@
           <h5 class="card-title">{{meal.name}}</h5>
           <h6 class="card-subtitle mb-2 text-muted">${{meal.price.toFixed(2)}}</h6>
           <p class="card-text">{{meal.description}}</p>
-          <a class="card-link text-danger" @click="deleteMeal(meal)">Delete</a>
+          <a v-if="!readonly" class="card-link text-danger" @click="deleteMeal(meal)">Delete</a>
         </div>
       </div>
     </div>
-    <div class="card-footer text-muted">
+    <div v-if="!readonly" class="card-footer text-muted">
       <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newMealModal" @click="openNewMeal">Add a meal</button>
     </div>
   </div>
@@ -57,18 +57,15 @@ import 'bootstrap';
 
 @Options({
   props: {
-    restaurantId: Number
+    restaurantId: Number,
+    readonly: Boolean
   },
   emits: ['mealsChanged']
 })
 export default class MealEditor extends Vue {
+  public readonly = false;
   public restaurantId?: number;
-  public meals: Meal[] = [
-    { name: 'Big Mac', description: 'A tasty burger', price: 1, id: 0, restaurantId: 0 },
-    { name: 'Big Mac', description: 'A tasty burger', price: 1, id: 1, restaurantId: 0 },
-    { name: 'Big Mac', description: 'A tasty burger', price: 1, id: 2, restaurantId: 0 },
-    { name: 'Big Mac', description: 'A tasty burger', price: 1, id: 3, restaurantId: 0 }
-  ];
+  public meals: Meal[] = [];
 
   public newMealFormValidated = false;
   public newMealLoading = false;
@@ -131,6 +128,13 @@ export default class MealEditor extends Vue {
   .meal-card {
     width: 300px;
     display: inline-block;
+  }
+}
+
+.meal-container.readonly {
+  border: none;
+  &>.card-body {
+    padding: 0;
   }
 }
 </style>
