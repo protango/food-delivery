@@ -212,6 +212,7 @@ export default class Dashboard extends Vue {
 
   public logout (): void {
     AuthService.logout();
+    this.$router.push('/');
   }
 }
 </script>
