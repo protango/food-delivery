@@ -77,7 +77,7 @@ namespace FoodDelivery.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostRestaurant", dbRestaurant);
+            return CreatedAtAction("PostRestaurant", dbRestaurant.Entity);
         }
 
         [ProducesResponseType(204)]
