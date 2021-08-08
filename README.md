@@ -1,5 +1,5 @@
-# Generic Food Delivery Company
-*A completely original food delivery service*
+# Food Delivery Co
+*A cool food delivery service*
 
 ## Authentication
 The application requires a suitable JWT signing key to be configured in secret storage under the key `JWT:Key`. This can be set like so:
