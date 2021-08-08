@@ -24,13 +24,13 @@ namespace FoodDelivery.Controllers
 
         // GET: api/Orders
         [HttpGet]
-        [Authorize(Roles = "CUSTOMER")]
+        [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             var userId = Utilities.ExtractUserId(User);
             
             return await _context.Orders
-                .Where(x => x.UserId == userId)
+                .Where(x => x.UserId == userId || x.Restaurant!.OwnerUserId == userId)
                 .Include(x => x.User)
                 .Include(x => x.Meals)
                 .OrderByDescending(x => x.CreatedAt)

@@ -50,7 +50,7 @@ const routes: Array<RouteRecordRaw> = [
         component: Restaurants
       },
       {
-        path: 'orders/:mode',
+        path: 'orders',
         name: 'Orders',
         component: Orders
       },

@@ -18,9 +18,9 @@
           <table style="min-width: 310px;" class="table table-striped">
             <tbody>
               <tr v-for="orderMeal in orderMealGroups[order.id]" :key="orderMeal.id">
-                <td>{{orderMeal.qty}}x</td>
+                <td style="width: 20%">{{orderMeal.qty}}x</td>
                 <td>{{orderMeal.name}}</td>
-                <td>${{orderMeal.total.toFixed(2)}}</td>
+                <td style="width: 20%">${{orderMeal.total.toFixed(2)}}</td>
               </tr>
               <tr>
                 <td colspan="2" class="text-end fw-bold">TOTAL</td>
@@ -28,11 +28,42 @@
               </tr>
             </tbody>
           </table>
-          <button v-if="isOwner && order.status === 'PLACED'" class="btn btn-primary me-1">Mark as processing</button>
-          <button v-if="isCustomer && order.status === 'PLACED'" class="btn btn-danger me-1">Cancel order</button>
-          <button v-if="isOwner && order.status === 'PROCESSING'" class="btn btn-primary me-1">Mark as en route</button>
-          <button v-if="isOwner && order.status === 'EN_ROUTE'" class="btn btn-success me-1">Mark as delivered</button>
-          <button v-if="isCustomer && order.status === 'DELIVERED'" class="btn btn-success me-1">Mark as received</button>
+
+          <button
+            v-if="isOwner && order.status === 'PLACED'" class="btn btn-primary me-1" :disabled="ordersLoading.has(order.id)"
+            @click="changeOrderStatus(order.id, 'PROCESSING')"
+          >
+            <div class="spinner-border spinner-border-sm" v-if="ordersLoading.has(order.id)"></div>
+            Mark as processing
+          </button>
+          <button
+            v-if="isCustomer && order.status === 'PLACED'" class="btn btn-danger me-1" :disabled="ordersLoading.has(order.id)"
+            @click="changeOrderStatus(order.id, 'CANCELLED')"
+          >
+            <div class="spinner-border spinner-border-sm" v-if="ordersLoading.has(order.id)"></div>
+            Cancel order
+          </button>
+          <button
+            v-if="isOwner && order.status === 'PROCESSING'" class="btn btn-primary me-1" :disabled="ordersLoading.has(order.id)"
+            @click="changeOrderStatus(order.id, 'EN_ROUTE')"
+          >
+            <div class="spinner-border spinner-border-sm" v-if="ordersLoading.has(order.id)"></div>
+            Mark as en route
+          </button>
+          <button
+            v-if="isOwner && order.status === 'EN_ROUTE'" class="btn btn-success me-1" :disabled="ordersLoading.has(order.id)"
+            @click="changeOrderStatus(order.id, 'DELIVERED')"
+          >
+            <div class="spinner-border spinner-border-sm" v-if="ordersLoading.has(order.id)"></div>
+            Mark as delivered
+          </button>
+          <button
+            v-if="isCustomer && order.status === 'DELIVERED'" class="btn btn-success me-1" :disabled="ordersLoading.has(order.id)"
+            @click="changeOrderStatus(order.id, 'RECEIVED')"
+          >
+            <div class="spinner-border spinner-border-sm" v-if="ordersLoading.has(order.id)"></div>
+            Mark as received
+          </button>
         </div>
       </div>
     </li>
@@ -55,8 +86,9 @@ export default class OrderEditor extends AuthenticatedVue {
   public orders: Order[] = [];
   public orderMealGroups: Record<number, {id: number, qty: number, name: string, total: number}[]> = {};
   public orderTotals: Record<number, number> = {};
+  public ordersLoading = new Set<number>();
 
-  public async beforeCreate (): Promise<void> {
+  public async refresh (): Promise<void> {
     if (this.restaurantId != null) {
       this.orders = await OrderService.getForRestaurant(this.restaurantId);
     } else {
@@ -72,6 +104,12 @@ export default class OrderEditor extends AuthenticatedVue {
       a[x.id] = this.orderMealGroups[x.id].reduce((sum, g) => sum + g.total, 0);
       return a;
     }, {} as Record<number, number>);
+
+    this.$emit('loaded');
+  }
+
+  public async mounted (): Promise<void> {
+    this.refresh();
   }
 
   public statusInfo = {
@@ -97,6 +135,16 @@ export default class OrderEditor extends AuthenticatedVue {
     }, {} as Record<number, {id: number, qty: number, name: string, total: number}>);
 
     return Object.values(reduction);
+  }
+
+  public async changeOrderStatus (orderId: number, status: OrderStatus): Promise<void> {
+    this.ordersLoading.add(orderId);
+    try {
+      await OrderService.changeStatus(orderId, status);
+      await this.refresh();
+    } finally {
+      this.ordersLoading.delete(orderId);
+    }
   }
 }
 </script>

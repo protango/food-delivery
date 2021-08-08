@@ -35,15 +35,9 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/dashboard/orders/customer">
+              <router-link class="nav-link" to="/dashboard/orders">
                 <i class="fas fa-file-invoice-dollar"></i>
-                My Orders
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/dashboard/orders/owner">
-                <i class="fas fa-file-invoice"></i>
-                All Orders
+                Orders
               </router-link>
             </li>
           </ul>

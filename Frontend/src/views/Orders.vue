@@ -1,5 +1,7 @@
 <template>
-  <h1>{{customerMode ? "My" : "All"}} Orders</h1>
+  <loading-overlay v-if="loading" message="Loading"></loading-overlay>
+  <h1>Orders</h1>
+  <order-editor @loaded="loading = false"></order-editor>
 </template>
 
 <style lang="scss">
@@ -7,18 +9,24 @@
 </style>
 
 <script lang="ts">
-import { Vue, Options } from 'vue-class-component';
+import AuthenticatedVue from '@/components/AuthenticatedVue';
+import { Options } from 'vue-class-component';
+import LoadingOverlay from '../components/LoadingOverlay.vue';
+import OrderEditor from '../components/OrderEditor.vue';
 @Options({
   components: {
+    LoadingOverlay,
+    OrderEditor
   }
 })
-export default class Orders extends Vue {
-  public get customerMode (): boolean {
-    return this.$route.params.mode === 'customer';
-  }
+export default class Orders extends AuthenticatedVue {
+  public loading = true;
 
   public async beforeCreate (): Promise<void> {
-    console.log('lmao');
+    try {
+    } catch {
+      this.$router.push('/');
+    }
   }
 }
 </script>
