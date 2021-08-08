@@ -7,10 +7,11 @@
       <div class="ms-2 me-auto">
         <div class="fw-bold">
           Order #{{order.id}}
+          <router-link v-if="orderId == null" class="fw-normal ms-4 link-primary" :to="`/dashboard/order/${order.id}`">View history</router-link>
           <span :class="{[statusInfo[order.status].class]: true}" class="badge float-end fs-6">Status: {{statusInfo[order.status].prettyName}}</span>
         </div>
         <div class="mb-1">
-          <span class="text-muted me-3 text-nowrap">{{order.createdAt}}</span>
+          <span class="text-muted me-3 text-nowrap">{{new Date(order.createdAt).toLocaleString()}}</span>
           &#8203;
           <span class="text-muted text-nowrap">Placed by: {{order.userName}}</span>
         </div>
@@ -67,31 +68,58 @@
         </div>
       </div>
     </li>
+    <li v-if="orderId != null" class="list-group-item">
+      <h5>Order history</h5>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="statusChange in orderHistory" :key="statusChange.status">
+              <td>{{new Date(statusChange.at).toLocaleString()}}</td>
+              <td><span :class="{[statusInfo[statusChange.status].class]: true}" class="badge fs-6">{{statusInfo[statusChange.status].prettyName}}</span></td>
+            </tr>
+          </tbody>
+        </table>
+    </li>
   </ul>
 </template>
 
 <script lang="ts">
 import { Meal } from '@/services/mealService';
-import { Order, OrderService, OrderStatus } from '@/services/orderService';
+import { Order, OrderService, OrderStatus, OrderStatusChange, OrderWithHistory } from '@/services/orderService';
 import { Options } from 'vue-class-component';
 import AuthenticatedVue from './AuthenticatedVue';
 
 @Options({
   props: {
-    restaurantId: Number
+    restaurantId: Number,
+    orderId: Number
   }
 })
 export default class OrderEditor extends AuthenticatedVue {
   public restaurantId?: number;
+  public orderId?: number;
   public orders: Order[] = [];
   public orderTotals: Record<number, number> = {};
   public ordersLoading = new Set<number>();
   public refreshInterval?: number;
 
+  public orderHistory?: OrderStatusChange[] = [];
+
   public async refresh (): Promise<void> {
     if (this.restaurantId != null) {
+      this.orderHistory = undefined;
       this.orders = await OrderService.getForRestaurant(this.restaurantId);
+    } else if (this.orderId != null) {
+      const order = await OrderService.getDetail(this.orderId);
+      this.orderHistory = order.orderStatusChanges;
+      this.orders = [order];
     } else {
+      this.orderHistory = undefined;
       this.orders = await OrderService.get();
     }
 

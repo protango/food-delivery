@@ -7,6 +7,7 @@ import Restaurant from '../views/Restaurant.vue';
 import Blocks from '../views/Blocks.vue';
 import NewOrder from '../views/NewOrder.vue';
 import Orders from '../views/Orders.vue';
+import Order from '../views/Order.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -53,6 +54,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'orders',
         name: 'Orders',
         component: Orders
+      },
+      {
+        path: 'order/:id',
+        name: 'Order',
+        component: Order
       },
       {
         path: 'restaurant/:id',

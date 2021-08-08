@@ -38,6 +38,38 @@ namespace FoodDelivery.Controllers
                 .ToListAsync();
         }
 
+        [HttpGet("{id}")]
+        [Authorize(Roles = "CUSTOMER,RESTAURANT_OWNER")]
+        public async Task<ActionResult<OrderWithHistory>> GetOrder(long id)
+        {
+            var userId = Utilities.ExtractUserId(User);
+
+            var order = await _context.Orders
+                .Include(x => x.User)
+                .Include(x => x.OrderMeals)
+                .ThenInclude(x => x.Meal)
+                .Include(x => x.OrderStatusChanges)
+                .Include(x => x.Restaurant)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (order == null)
+                return NotFound("Invalid id");
+            if (!(order.UserId == userId || order.Restaurant!.OwnerUserId == userId))
+                return StatusCode(403, "User does not have access to this data");
+
+
+            return new OrderWithHistory() {
+                Id = order.Id,
+                CreatedAt = order.CreatedAt,
+                OrderMeals = order.OrderMeals,
+                Restaurant = order.Restaurant,
+                OrderStatusChanges = order.OrderStatusChanges,
+                RestaurantId = order.RestaurantId,
+                Status = order.Status,
+                User = order.User,
+                UserId = order.UserId
+            };
+        }
+
         // GET: api/Orders/ForRestaurant/5
         [HttpGet("ForRestaurant/{id}")]
         [Authorize(Roles = "RESTAURANT_OWNER")]

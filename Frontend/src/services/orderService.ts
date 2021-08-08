@@ -32,9 +32,21 @@ export interface CreateOrder {
   mealIds: number[];
 }
 
+export interface OrderStatusChange {
+  orderId: number;
+  status: OrderStatus;
+  at: Date;
+}
+
+export type OrderWithHistory = Order & { orderStatusChanges: OrderStatusChange[] };
+
 export abstract class OrderService {
   public static async get (): Promise<Order[]> {
     return (await axios.get<Order[]>('/api/Orders')).data;
+  }
+
+  public static async getDetail (id: number): Promise<OrderWithHistory> {
+    return (await axios.get<OrderWithHistory>('/api/Orders/' + id)).data;
   }
 
   public static async create (order: CreateOrder): Promise<Order> {
