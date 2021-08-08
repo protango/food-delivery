@@ -32,7 +32,8 @@ namespace FoodDelivery.Controllers
             return await _context.Orders
                 .Where(x => x.UserId == userId || x.Restaurant!.OwnerUserId == userId)
                 .Include(x => x.User)
-                .Include(x => x.Meals)
+                .Include(x => x.OrderMeals)
+                .ThenInclude(x => x.Meal)
                 .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
         }
@@ -44,13 +45,16 @@ namespace FoodDelivery.Controllers
         {
             var userId = Utilities.ExtractUserId(User);
             var restaurant = await _context.Restaurants.FindAsync(id);
+            if (restaurant == null)
+                return NotFound("Invalid id");
             if (restaurant.OwnerUserId != userId)
                 return StatusCode(403, "User does not have access to this data");
 
             return await _context.Orders
                 .Where(x => x.RestaurantId == id)
                 .Include(x => x.User)
-                .Include(x => x.Meals)
+                .Include(x => x.OrderMeals)
+                .ThenInclude(x => x.Meal)
                 .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
         }
@@ -98,11 +102,16 @@ namespace FoodDelivery.Controllers
                     }
                 },
                 Status = OrderStatus.PLACED,
-                Meals = (ICollection<Meal>)orderMeals
+                OrderMeals = (from id in createOrder.MealIds
+                              group id by id into g
+                              select new OrderMeal() { 
+                                 MealId = g.Key,
+                                 Qty = g.Count()
+                              }).ToArray()
             });
             await _context.SaveChangesAsync();
             await _context.Entry(order.Entity).Reference(x => x.User).LoadAsync();
-            await _context.Entry(order.Entity).Collection(x => x.Meals).LoadAsync();
+            await _context.Entry(order.Entity).Collection(x => x.OrderMeals).LoadAsync();
             return CreatedAtAction("PostOrder", order.Entity);
         }
 

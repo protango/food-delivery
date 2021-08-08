@@ -27,7 +27,7 @@ namespace FoodDelivery.Db
         [JsonIgnore]
         public Restaurant? Restaurant { get; set; }
 
-        public ICollection<Meal>? Meals { get; set; }
+        public ICollection<OrderMeal>? OrderMeals { get; set; }
 
         [JsonIgnore]
         public ICollection<OrderStatusChange>? OrderStatusChanges { get; set; }

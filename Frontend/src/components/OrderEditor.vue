@@ -17,10 +17,10 @@
         <div>
           <table style="min-width: 310px;" class="table table-striped">
             <tbody>
-              <tr v-for="orderMeal in orderMealGroups[order.id]" :key="orderMeal.id">
+              <tr v-for="orderMeal in order.orderMeals" :key="orderMeal.mealId">
                 <td style="width: 20%">{{orderMeal.qty}}x</td>
-                <td>{{orderMeal.name}}</td>
-                <td style="width: 20%">${{orderMeal.total.toFixed(2)}}</td>
+                <td>{{orderMeal.meal.name}}</td>
+                <td style="width: 20%">${{(orderMeal.qty * orderMeal.meal.price).toFixed(2)}}</td>
               </tr>
               <tr>
                 <td colspan="2" class="text-end fw-bold">TOTAL</td>
@@ -84,7 +84,6 @@ import AuthenticatedVue from './AuthenticatedVue';
 export default class OrderEditor extends AuthenticatedVue {
   public restaurantId?: number;
   public orders: Order[] = [];
-  public orderMealGroups: Record<number, {id: number, qty: number, name: string, total: number}[]> = {};
   public orderTotals: Record<number, number> = {};
   public ordersLoading = new Set<number>();
 
@@ -95,13 +94,8 @@ export default class OrderEditor extends AuthenticatedVue {
       this.orders = await OrderService.get();
     }
 
-    this.orderMealGroups = this.orders.reduce((a, x) => {
-      a[x.id] = this.groupMeals(x.meals);
-      return a;
-    }, {} as Record<number, {id: number, qty: number, name: string, total: number}[]>);
-
     this.orderTotals = this.orders.reduce((a, x) => {
-      a[x.id] = this.orderMealGroups[x.id].reduce((sum, g) => sum + g.total, 0);
+      a[x.id] = x.orderMeals.reduce((sum, g) => sum + g.qty * g.meal.price, 0);
       return a;
     }, {} as Record<number, number>);
 

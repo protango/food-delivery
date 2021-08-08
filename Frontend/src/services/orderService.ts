@@ -10,6 +10,13 @@ export enum OrderStatus {
   RECEIVED = 'RECEIVED',
 }
 
+export interface OrderMeal {
+  orderId: number,
+  mealId: number,
+  qty: number,
+  meal: Meal
+}
+
 export interface Order {
   id: number;
   restaurantId: number;
@@ -17,7 +24,7 @@ export interface Order {
   status: OrderStatus;
   userId: string;
   userName: string;
-  meals: Meal[]
+  orderMeals: OrderMeal[]
 }
 
 export interface CreateOrder {
