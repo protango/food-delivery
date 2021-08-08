@@ -148,7 +148,7 @@ export default class OrderEditor extends AuthenticatedVue {
     [OrderStatus.PROCESSING]: { prettyName: 'Processing', class: 'bg-primary' },
     [OrderStatus.EN_ROUTE]: { prettyName: 'En Route', class: 'bg-primary' },
     [OrderStatus.DELIVERED]: { prettyName: 'Delivered', class: 'bg-primary' },
-    [OrderStatus.RECEIVED]: { prettyName: 'Recieved', class: 'bg-success' }
+    [OrderStatus.RECEIVED]: { prettyName: 'Received', class: 'bg-success' }
   };
 
   public groupMeals (meals: Meal[]): {id: number, qty: number, name: string, total: number}[] {

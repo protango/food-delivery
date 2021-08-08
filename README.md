@@ -1,6 +1,15 @@
 # Food Delivery Co
 *A cool food delivery service*
 
+## Frontend
+The frontend must be built before it can be used, for production, run the following commands in the `Frontend` directory
+```
+yarn install
+yarn build
+```
+
+This will build the frontend and place it in `wwwroot`. From there the web server can be started.
+
 ## Authentication
 The application requires a suitable JWT signing key to be configured in secret storage under the key `JWT:Key`. This can be set like so:
 ```
