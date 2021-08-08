@@ -86,6 +86,7 @@ export default class OrderEditor extends AuthenticatedVue {
   public orders: Order[] = [];
   public orderTotals: Record<number, number> = {};
   public ordersLoading = new Set<number>();
+  public refreshInterval?: number;
 
   public async refresh (): Promise<void> {
     if (this.restaurantId != null) {
@@ -104,6 +105,13 @@ export default class OrderEditor extends AuthenticatedVue {
 
   public async mounted (): Promise<void> {
     this.refresh();
+    this.refreshInterval = setInterval(() => {
+      this.refresh();
+    }, 5000);
+  }
+
+  public async unmounted (): Promise<void> {
+    clearInterval(this.refreshInterval);
   }
 
   public statusInfo = {
