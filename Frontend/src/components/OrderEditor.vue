@@ -28,11 +28,11 @@
               </tr>
             </tbody>
           </table>
-          <button v-if="isOwner && order.status === 'PLACED'" class="btn btn-primary">Mark as processing</button>
-          <button v-if="isCustomer && order.status === 'PLACED'" class="btn btn-danger">Cancel order</button>
-          <button v-if="isOwner && order.status === 'PROCESSING'" class="btn btn-primary">Mark as en route</button>
-          <button v-if="isOwner && order.status === 'EN_ROUTE'" class="btn btn-success">Mark as delivered</button>
-          <button v-if="isCustomer && order.status === 'DELIVERED'" class="btn btn-success">Mark as received</button>
+          <button v-if="isOwner && order.status === 'PLACED'" class="btn btn-primary me-1">Mark as processing</button>
+          <button v-if="isCustomer && order.status === 'PLACED'" class="btn btn-danger me-1">Cancel order</button>
+          <button v-if="isOwner && order.status === 'PROCESSING'" class="btn btn-primary me-1">Mark as en route</button>
+          <button v-if="isOwner && order.status === 'EN_ROUTE'" class="btn btn-success me-1">Mark as delivered</button>
+          <button v-if="isCustomer && order.status === 'DELIVERED'" class="btn btn-success me-1">Mark as received</button>
         </div>
       </div>
     </li>

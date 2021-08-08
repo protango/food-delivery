@@ -33,6 +33,7 @@ namespace FoodDelivery.Controllers
                 .Where(x => x.UserId == userId)
                 .Include(x => x.User)
                 .Include(x => x.Meals)
+                .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
         }
 
@@ -50,6 +51,7 @@ namespace FoodDelivery.Controllers
                 .Where(x => x.RestaurantId == id)
                 .Include(x => x.User)
                 .Include(x => x.Meals)
+                .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
         }
 

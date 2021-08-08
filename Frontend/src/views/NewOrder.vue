@@ -112,7 +112,7 @@ export default class NewOrder extends Vue {
     });
     this.loading = false;
 
-    this.$router.push('/dashboard/orders');
+    this.$router.push('/dashboard/orders/customer');
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <h1>Orders</h1>
+  <h1>{{customerMode ? "My" : "All"}} Orders</h1>
 </template>
 
 <style lang="scss">
@@ -13,5 +13,12 @@ import { Vue, Options } from 'vue-class-component';
   }
 })
 export default class Orders extends Vue {
+  public get customerMode (): boolean {
+    return this.$route.params.mode === 'customer';
+  }
+
+  public async beforeCreate (): Promise<void> {
+    console.log('lmao');
+  }
 }
 </script>

@@ -35,9 +35,15 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/dashboard/orders">
+              <router-link class="nav-link" to="/dashboard/orders/customer">
                 <i class="fas fa-file-invoice-dollar"></i>
-                {{isCustomer ? 'Past' : 'All'}} Orders
+                My Orders
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/dashboard/orders/owner">
+                <i class="fas fa-file-invoice"></i>
+                All Orders
               </router-link>
             </li>
           </ul>

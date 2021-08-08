@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FoodDelivery
@@ -40,6 +41,8 @@ namespace FoodDelivery
                 {
                     opt.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                     opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    var enumConverter = new JsonStringEnumConverter();
+                    opt.JsonSerializerOptions.Converters.Add(enumConverter);
                 });
 
             services.AddSwaggerGen(c =>
