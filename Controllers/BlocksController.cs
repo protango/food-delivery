@@ -36,22 +36,26 @@ namespace FoodDelivery.Controllers
 
         // POST: api/UserBlocks
         [ProducesResponseType(204)]
-        [HttpPost("{userId}")]
+        [HttpPost("{username}")]
         [Authorize(Roles = "RESTAURANT_OWNER")]
-        public async Task<ActionResult<Block>> BlockUser(string userId)
+        public async Task<ActionResult<Block>> BlockUser(string username)
         {
             var blockingUserId = Utilities.ExtractUserId(User);
 
-            if (await _context.Users.FindAsync(userId) == null)
+            var blockedUser = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+            if (blockedUser == null)
                 return NotFound("Invalid user id");
 
-            if (await _context.Blocks.FindAsync(blockingUserId, userId) != null)
+            if (blockedUser.Id == blockingUserId)
+                return BadRequest("You cannot block yourself");
+
+            if (await _context.Blocks.FindAsync(blockingUserId, blockedUser.Id) != null)
                 return Conflict("This user is already blocked");
 
             _context.Blocks.Add(new Block()
             {
                 BlockingUserId = blockingUserId,
-                BlockedUserId = userId
+                BlockedUserId = blockedUser.Id
             });
 
             await _context.SaveChangesAsync();
@@ -61,7 +65,7 @@ namespace FoodDelivery.Controllers
 
         // DELETE: api/UserBlocks/5
         [ProducesResponseType(204)]
-        [HttpDelete("{id}")]
+        [HttpDelete("{userId}")]
         [Authorize(Roles = "RESTAURANT_OWNER")]
         public async Task<IActionResult> DeleteUserBlock(string userId)
         {

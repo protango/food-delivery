@@ -11,8 +11,8 @@ export abstract class BlockService {
     return (await axios.get<Block[]>('/api/Blocks')).data;
   }
 
-  public static async create (userId: string): Promise<void> {
-    await axios.post<void>('/api/Blocks/' + userId);
+  public static async create (username: string): Promise<void> {
+    await axios.post<void>('/api/Blocks/' + username);
   }
 
   public static async delete (userId: string): Promise<void> {

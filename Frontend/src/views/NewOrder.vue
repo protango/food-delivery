@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import { Meal, MealService } from '@/services/mealService';
-import { Order, OrderService } from '@/services/orderService';
+import { OrderService } from '@/services/orderService';
 import { Restaurant, RestaurantService } from '@/services/restaurantService';
 import { Vue, Options } from 'vue-class-component';
 import LoadingOverlay from '../components/LoadingOverlay.vue';
