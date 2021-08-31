@@ -1,6 +1,8 @@
 # Food Delivery Co
 *A cool food delivery service*
 
+Live site can be accessed here: https://fooddelivery20210808183729.azurewebsites.net/
+
 ## Frontend
 The frontend must be built before it can be used, for production, run the following commands in the `Frontend` directory
 ```
